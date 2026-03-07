@@ -1,0 +1,12 @@
+.{
+    .name = .leadrgtk,
+    .version = "0.0.1",
+    .minimum_zig_version = "0.15.1",
+    .paths = .{""},
+    .fingerprint = 0x896fb53d8a34e33d,
+    .dependencies = .{
+        .gobject = .{
+            .path = "bindings",
+        },
+    },
+}
