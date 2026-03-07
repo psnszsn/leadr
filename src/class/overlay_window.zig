@@ -107,7 +107,6 @@ pub const OverlayWindow = extern struct {
                     priv.navigator.push(sticky.bindings);
                     priv.sticky_timeout_ms = sticky.timeout_ms;
                     priv.cheatsheet.updateBindings(priv.navigator.current());
-                    resetStickyTimer(self);
                 },
                 .command => |cmd| {
                     if (priv.sticky_timeout_ms != 0) {
