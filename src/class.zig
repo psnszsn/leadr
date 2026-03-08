@@ -8,6 +8,7 @@ pub const Application = @import("class/application.zig").Application;
 pub const OverlayWindow = @import("class/overlay_window.zig").OverlayWindow;
 pub const KeyIndicator = @import("class/key_indicator.zig").KeyIndicator;
 pub const Cheatsheet = @import("class/cheatsheet.zig").Cheatsheet;
+pub const EmojiPicker = @import("class/emoji_picker.zig").EmojiPicker;
 
 /// Common methods for all GObject classes we create.
 pub fn Common(

@@ -6,6 +6,7 @@ const gobject = @import("gobject");
 const gtk = @import("gtk");
 
 const Common = @import("../class.zig").Common;
+const Application = @import("application.zig").Application;
 const KeyIndicator = @import("key_indicator.zig").KeyIndicator;
 const Cheatsheet = @import("cheatsheet.zig").Cheatsheet;
 const config = @import("../config.zig");
@@ -116,6 +117,13 @@ pub const OverlayWindow = extern struct {
                     } else {
                         self.hideOverlay();
                         spawnCommand(cmd);
+                    }
+                },
+                .emoji => {
+                    self.hideOverlay();
+                    if (self.as(gtk.Window).getApplication()) |app_| {
+                        const app: *Application = @ptrCast(@alignCast(app_));
+                        app.showEmojiPicker();
                     }
                 },
                 .quit => {

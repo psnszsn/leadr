@@ -69,7 +69,7 @@ pub const Cheatsheet = extern struct {
                     arrow.as(gtk.Widget).addCssClass("group-indicator");
                     row.append(arrow.as(gtk.Widget));
                 },
-                .command, .quit => {},
+                .command, .emoji, .quit => {},
             }
 
             container.append(row.as(gtk.Widget));

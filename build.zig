@@ -41,7 +41,7 @@ pub fn build(b: *std.Build) void {
     const wf = b.addWriteFiles();
 
     // Compile each .blp → .ui and collect into write-files directory
-    const blueprint_names = [_][]const u8{ "overlay-window", "key-indicator", "cheatsheet" };
+    const blueprint_names = [_][]const u8{ "overlay-window", "key-indicator", "cheatsheet", "emoji-picker" };
     for (blueprint_names) |name| {
         const bp_compile = b.addSystemCommand(&.{ "blueprint-compiler", "compile", "--output" });
         const ui_file = bp_compile.addOutputFileArg(b.fmt("{s}.ui", .{name}));
@@ -63,6 +63,7 @@ pub fn build(b: *std.Build) void {
         \\    <file compressed="true" preprocess="xml-stripblanks">overlay-window.ui</file>
         \\    <file compressed="true" preprocess="xml-stripblanks">key-indicator.ui</file>
         \\    <file compressed="true" preprocess="xml-stripblanks">cheatsheet.ui</file>
+        \\    <file compressed="true" preprocess="xml-stripblanks">emoji-picker.ui</file>
         \\  </gresource>
         \\</gresources>
         \\

@@ -44,3 +44,28 @@
     opacity: 0.6;
     margin-left: 4px;
 }
+
+.emoji-picker {
+    background: alpha(@window_bg_color, 0.92);
+    border-radius: 16px;
+}
+
+.emoji-preview {
+    padding: 8px 12px;
+    border-top: 1px solid alpha(@window_fg_color, 0.15);
+}
+
+.emoji-preview label:first-child {
+    font-size: 32px;
+}
+
+.emoji-preview label:last-child {
+    opacity: 0.7;
+}
+
+.emoji-cell {
+    font-size: 28px;
+    padding: 4px;
+    min-width: 40px;
+    min-height: 40px;
+}

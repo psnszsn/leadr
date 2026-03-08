@@ -49,5 +49,6 @@ pub const bindings: []const config.Binding = &.{
         .{ .key = 'b', .label = "Previous", .action = .{ .command = "playerctl previous" } },
     } } },
     .{ .key = 'x', .label = "Close Window", .action = .{ .command = "niri msg action close-window" } },
+    .{ .key = 'e', .label = "Emoji", .action = .emoji },
     .{ .key = 'q', .label = "Quit", .action = .quit },
 };
