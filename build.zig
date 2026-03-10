@@ -1,4 +1,5 @@
 const std = @import("std");
+const whisper_build = @import("whisper.build.zig");
 
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
@@ -26,6 +27,9 @@ pub fn build(b: *std.Build) void {
         .{ "gobject", "gobject2" },
         .{ "gtk", "gtk4" },
         .{ "gtk4_layer_shell", "gtk4layershell1" },
+        .{ "gst", "gst1" },
+        .{ "gst_app", "gstapp1" },
+        .{ "gst_base", "gstbase1" },
     };
     inline for (gobject_imports) |import_| {
         const name, const module = import_;
@@ -36,12 +40,18 @@ pub fn build(b: *std.Build) void {
     mod.linkSystemLibrary("gtk4", .{});
     mod.linkSystemLibrary("libadwaita-1", .{});
     mod.linkSystemLibrary("gtk4-layer-shell-0", .{});
+    mod.linkSystemLibrary("gstreamer-1.0", .{});
+    mod.linkSystemLibrary("gstreamer-app-1.0", .{});
+
+    // whisper.cpp — compiled from source via whisper.build.zig
+    const whisper_lib = whisper_build.addWhisper(b, target, optimize);
+    mod.linkLibrary(whisper_lib);
 
     // --- Blueprint & GResource compilation ---
     const wf = b.addWriteFiles();
 
     // Compile each .blp → .ui and collect into write-files directory
-    const blueprint_names = [_][]const u8{ "overlay-window", "key-indicator", "cheatsheet", "emoji-picker" };
+    const blueprint_names = [_][]const u8{ "overlay-window", "key-indicator", "cheatsheet", "emoji-picker", "dictation" };
     for (blueprint_names) |name| {
         const bp_compile = b.addSystemCommand(&.{ "blueprint-compiler", "compile", "--output" });
         const ui_file = bp_compile.addOutputFileArg(b.fmt("{s}.ui", .{name}));
@@ -64,6 +74,7 @@ pub fn build(b: *std.Build) void {
         \\    <file compressed="true" preprocess="xml-stripblanks">key-indicator.ui</file>
         \\    <file compressed="true" preprocess="xml-stripblanks">cheatsheet.ui</file>
         \\    <file compressed="true" preprocess="xml-stripblanks">emoji-picker.ui</file>
+        \\    <file compressed="true" preprocess="xml-stripblanks">dictation.ui</file>
         \\  </gresource>
         \\</gresources>
         \\

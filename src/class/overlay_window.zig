@@ -126,6 +126,13 @@ pub const OverlayWindow = extern struct {
                         app.showEmojiPicker();
                     }
                 },
+                .dictation => {
+                    self.hideOverlay();
+                    if (self.as(gtk.Window).getApplication()) |app_| {
+                        const app: *Application = @ptrCast(@alignCast(app_));
+                        app.showDictation();
+                    }
+                },
                 .quit => {
                     self.hideOverlay();
                     if (self.as(gtk.Window).getApplication()) |app| {

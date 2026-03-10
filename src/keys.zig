@@ -50,5 +50,6 @@ pub const bindings: []const config.Binding = &.{
     } } },
     .{ .key = 'x', .label = "Close Window", .action = .{ .command = "niri msg action close-window" } },
     .{ .key = 'e', .label = "Emoji", .action = .emoji },
+    .{ .key = 'v', .label = "Voice", .action = .dictation },
     .{ .key = 'q', .label = "Quit", .action = .quit },
 };

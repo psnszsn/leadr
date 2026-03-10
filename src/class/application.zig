@@ -7,6 +7,7 @@ const gobject = @import("gobject");
 const gtk = @import("gtk");
 
 const Common = @import("../class.zig").Common;
+const Dictation = @import("dictation.zig").Dictation;
 const EmojiPicker = @import("emoji_picker.zig").EmojiPicker;
 const OverlayWindow = @import("overlay_window.zig").OverlayWindow;
 
@@ -25,6 +26,7 @@ pub const Application = extern struct {
     const Private = struct {
         overlay_window: ?*OverlayWindow = null,
         emoji_picker: ?*EmojiPicker = null,
+        dictation: ?*Dictation = null,
         css_provider: ?*gtk.CssProvider = null,
 
         pub var offset: c_int = 0;
@@ -61,6 +63,11 @@ pub const Application = extern struct {
         const emoji_picker = gobject.ext.newInstance(EmojiPicker, .{});
         emoji_picker.as(gtk.Window).setApplication(self.as(gtk.Application));
         priv.emoji_picker = emoji_picker;
+
+        // Create dictation window
+        const dictation = gobject.ext.newInstance(Dictation, .{});
+        dictation.as(gtk.Window).setApplication(self.as(gtk.Application));
+        priv.dictation = dictation;
     }
 
     fn activate(self: *Self) callconv(.c) void {
@@ -91,6 +98,13 @@ pub const Application = extern struct {
         }
     }
 
+    pub fn showDictation(self: *Self) void {
+        const priv = private(self);
+        if (priv.dictation) |d| {
+            d.present();
+        }
+    }
+
     fn dispose(self: *Self) callconv(.c) void {
         const priv = private(self);
 
@@ -102,6 +116,11 @@ pub const Application = extern struct {
         if (priv.emoji_picker) |p| {
             p.unref();
             priv.emoji_picker = null;
+        }
+
+        if (priv.dictation) |d| {
+            d.unref();
+            priv.dictation = null;
         }
 
         if (priv.css_provider) |p| {
@@ -136,6 +155,7 @@ pub const Application = extern struct {
         fn init(class: *Class) callconv(.c) void {
             gobject.ext.ensureType(OverlayWindow);
             gobject.ext.ensureType(EmojiPicker);
+            gobject.ext.ensureType(Dictation);
             gio.Application.virtual_methods.startup.implement(class, &startup);
             gio.Application.virtual_methods.activate.implement(class, &activate);
             gio.Application.virtual_methods.command_line.implement(class, &commandLine);

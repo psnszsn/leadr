@@ -168,6 +168,96 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    const gstbase1 = b.addModule("gstbase1", .{
+        .root_source_file = b.path(b.pathJoin(&.{ "src", "gstbase1", "gstbase1" ++ ".zig" })),
+        .target = target,
+        .optimize = optimize,
+    });
+    libraries.gstbase1.linkTo(gstbase1);
+    gstbase1.addImport("compat", compat);
+
+    const gstbase1_test = b.addTest(.{
+        .root_module = gstbase1,
+    });
+    test_step.dependOn(&b.addRunArtifact(gstbase1_test).step);
+
+    const gst1 = b.addModule("gst1", .{
+        .root_source_file = b.path(b.pathJoin(&.{ "src", "gst1", "gst1" ++ ".zig" })),
+        .target = target,
+        .optimize = optimize,
+    });
+    libraries.gst1.linkTo(gst1);
+    gst1.addImport("compat", compat);
+
+    const gst1_test = b.addTest(.{
+        .root_module = gst1,
+    });
+    test_step.dependOn(&b.addRunArtifact(gst1_test).step);
+
+    const gobject2 = b.addModule("gobject2", .{
+        .root_source_file = b.path(b.pathJoin(&.{ "src", "gobject2", "gobject2" ++ ".zig" })),
+        .target = target,
+        .optimize = optimize,
+    });
+    libraries.gobject2.linkTo(gobject2);
+    gobject2.addImport("compat", compat);
+
+    const gobject2_test = b.addTest(.{
+        .root_module = gobject2,
+    });
+    test_step.dependOn(&b.addRunArtifact(gobject2_test).step);
+
+    const glib2 = b.addModule("glib2", .{
+        .root_source_file = b.path(b.pathJoin(&.{ "src", "glib2", "glib2" ++ ".zig" })),
+        .target = target,
+        .optimize = optimize,
+    });
+    libraries.glib2.linkTo(glib2);
+    glib2.addImport("compat", compat);
+
+    const glib2_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/glib2/glib2.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    libraries.glib2.linkTo(glib2_test_mod);
+    libraries.gobject2.linkTo(glib2_test_mod);
+    // Some deprecated thread functions require linking gthread-2.0
+    glib2_test_mod.linkSystemLibrary("gthread-2.0", .{ .use_pkg_config = .force });
+    glib2_test_mod.addImport("compat", compat);
+    glib2_test_mod.addImport("glib2", glib2_test_mod);
+
+    const glib2_test = b.addTest(.{
+        .root_module = glib2_test_mod,
+    });
+    test_step.dependOn(&b.addRunArtifact(glib2_test).step);
+
+    const gmodule2 = b.addModule("gmodule2", .{
+        .root_source_file = b.path(b.pathJoin(&.{ "src", "gmodule2", "gmodule2" ++ ".zig" })),
+        .target = target,
+        .optimize = optimize,
+    });
+    libraries.gmodule2.linkTo(gmodule2);
+    gmodule2.addImport("compat", compat);
+
+    const gmodule2_test = b.addTest(.{
+        .root_module = gmodule2,
+    });
+    test_step.dependOn(&b.addRunArtifact(gmodule2_test).step);
+
+    const gstapp1 = b.addModule("gstapp1", .{
+        .root_source_file = b.path(b.pathJoin(&.{ "src", "gstapp1", "gstapp1" ++ ".zig" })),
+        .target = target,
+        .optimize = optimize,
+    });
+    libraries.gstapp1.linkTo(gstapp1);
+    gstapp1.addImport("compat", compat);
+
+    const gstapp1_test = b.addTest(.{
+        .root_module = gstapp1,
+    });
+    test_step.dependOn(&b.addRunArtifact(gstapp1_test).step);
+
     const adw1 = b.addModule("adw1", .{
         .root_source_file = b.path(b.pathJoin(&.{ "src", "adw1", "adw1" ++ ".zig" })),
         .target = target,
@@ -219,44 +309,6 @@ pub fn build(b: *std.Build) void {
         .root_module = graphene1,
     });
     test_step.dependOn(&b.addRunArtifact(graphene1_test).step);
-
-    const gobject2 = b.addModule("gobject2", .{
-        .root_source_file = b.path(b.pathJoin(&.{ "src", "gobject2", "gobject2" ++ ".zig" })),
-        .target = target,
-        .optimize = optimize,
-    });
-    libraries.gobject2.linkTo(gobject2);
-    gobject2.addImport("compat", compat);
-
-    const gobject2_test = b.addTest(.{
-        .root_module = gobject2,
-    });
-    test_step.dependOn(&b.addRunArtifact(gobject2_test).step);
-
-    const glib2 = b.addModule("glib2", .{
-        .root_source_file = b.path(b.pathJoin(&.{ "src", "glib2", "glib2" ++ ".zig" })),
-        .target = target,
-        .optimize = optimize,
-    });
-    libraries.glib2.linkTo(glib2);
-    glib2.addImport("compat", compat);
-
-    const glib2_test_mod = b.createModule(.{
-        .root_source_file = b.path("src/glib2/glib2.zig"),
-        .target = target,
-        .optimize = optimize,
-    });
-    libraries.glib2.linkTo(glib2_test_mod);
-    libraries.gobject2.linkTo(glib2_test_mod);
-    // Some deprecated thread functions require linking gthread-2.0
-    glib2_test_mod.linkSystemLibrary("gthread-2.0", .{ .use_pkg_config = .force });
-    glib2_test_mod.addImport("compat", compat);
-    glib2_test_mod.addImport("glib2", glib2_test_mod);
-
-    const glib2_test = b.addTest(.{
-        .root_module = glib2_test_mod,
-    });
-    test_step.dependOn(&b.addRunArtifact(glib2_test).step);
 
     const gdk4 = b.addModule("gdk4", .{
         .root_source_file = b.path(b.pathJoin(&.{ "src", "gdk4", "gdk4" ++ ".zig" })),
@@ -349,19 +401,6 @@ pub fn build(b: *std.Build) void {
     });
     test_step.dependOn(&b.addRunArtifact(gio2_test).step);
 
-    const gmodule2 = b.addModule("gmodule2", .{
-        .root_source_file = b.path(b.pathJoin(&.{ "src", "gmodule2", "gmodule2" ++ ".zig" })),
-        .target = target,
-        .optimize = optimize,
-    });
-    libraries.gmodule2.linkTo(gmodule2);
-    gmodule2.addImport("compat", compat);
-
-    const gmodule2_test = b.addTest(.{
-        .root_module = gmodule2,
-    });
-    test_step.dependOn(&b.addRunArtifact(gmodule2_test).step);
-
     const gdkpixbuf2 = b.addModule("gdkpixbuf2", .{
         .root_source_file = b.path(b.pathJoin(&.{ "src", "gdkpixbuf2", "gdkpixbuf2" ++ ".zig" })),
         .target = target,
@@ -388,6 +427,26 @@ pub fn build(b: *std.Build) void {
     });
     test_step.dependOn(&b.addRunArtifact(gtk4layershell1_test).step);
 
+    gstbase1.addImport("gst1", gst1);
+    gstbase1.addImport("gobject2", gobject2);
+    gstbase1.addImport("glib2", glib2);
+    gstbase1.addImport("gmodule2", gmodule2);
+    gstbase1.addImport("gstbase1", gstbase1);
+    gst1.addImport("gobject2", gobject2);
+    gst1.addImport("glib2", glib2);
+    gst1.addImport("gmodule2", gmodule2);
+    gst1.addImport("gst1", gst1);
+    gobject2.addImport("glib2", glib2);
+    gobject2.addImport("gobject2", gobject2);
+    glib2.addImport("glib2", glib2);
+    gmodule2.addImport("glib2", glib2);
+    gmodule2.addImport("gmodule2", gmodule2);
+    gstapp1.addImport("gstbase1", gstbase1);
+    gstapp1.addImport("gst1", gst1);
+    gstapp1.addImport("gobject2", gobject2);
+    gstapp1.addImport("glib2", glib2);
+    gstapp1.addImport("gmodule2", gmodule2);
+    gstapp1.addImport("gstapp1", gstapp1);
     adw1.addImport("gtk4", gtk4);
     adw1.addImport("gsk4", gsk4);
     adw1.addImport("graphene1", graphene1);
@@ -433,9 +492,6 @@ pub fn build(b: *std.Build) void {
     graphene1.addImport("gobject2", gobject2);
     graphene1.addImport("glib2", glib2);
     graphene1.addImport("graphene1", graphene1);
-    gobject2.addImport("glib2", glib2);
-    gobject2.addImport("gobject2", gobject2);
-    glib2.addImport("glib2", glib2);
     gdk4.addImport("cairo1", cairo1);
     gdk4.addImport("gobject2", gobject2);
     gdk4.addImport("glib2", glib2);
@@ -476,8 +532,6 @@ pub fn build(b: *std.Build) void {
     gio2.addImport("glib2", glib2);
     gio2.addImport("gmodule2", gmodule2);
     gio2.addImport("gio2", gio2);
-    gmodule2.addImport("glib2", glib2);
-    gmodule2.addImport("gmodule2", gmodule2);
     gdkpixbuf2.addImport("gio2", gio2);
     gdkpixbuf2.addImport("gobject2", gobject2);
     gdkpixbuf2.addImport("glib2", glib2);
@@ -518,12 +572,16 @@ pub fn build(b: *std.Build) void {
         .install_subdir = "docs",
     });
     docs_step.dependOn(&install_docs.step);
+    docs_mod.addImport("gstbase1", gstbase1);
+    docs_mod.addImport("gst1", gst1);
+    docs_mod.addImport("gobject2", gobject2);
+    docs_mod.addImport("glib2", glib2);
+    docs_mod.addImport("gmodule2", gmodule2);
+    docs_mod.addImport("gstapp1", gstapp1);
     docs_mod.addImport("adw1", adw1);
     docs_mod.addImport("gtk4", gtk4);
     docs_mod.addImport("gsk4", gsk4);
     docs_mod.addImport("graphene1", graphene1);
-    docs_mod.addImport("gobject2", gobject2);
-    docs_mod.addImport("glib2", glib2);
     docs_mod.addImport("gdk4", gdk4);
     docs_mod.addImport("cairo1", cairo1);
     docs_mod.addImport("pangocairo1", pangocairo1);
@@ -531,12 +589,35 @@ pub fn build(b: *std.Build) void {
     docs_mod.addImport("harfbuzz0", harfbuzz0);
     docs_mod.addImport("freetype22", freetype22);
     docs_mod.addImport("gio2", gio2);
-    docs_mod.addImport("gmodule2", gmodule2);
     docs_mod.addImport("gdkpixbuf2", gdkpixbuf2);
     docs_mod.addImport("gtk4layershell1", gtk4layershell1);
 }
 
 pub const libraries = struct {
+    pub const gstbase1: Library = .{
+        .system_libraries = &.{"gstreamer-base-1.0"},
+    };
+
+    pub const gst1: Library = .{
+        .system_libraries = &.{"gstreamer-1.0"},
+    };
+
+    pub const gobject2: Library = .{
+        .system_libraries = &.{"gobject-2.0"},
+    };
+
+    pub const glib2: Library = .{
+        .system_libraries = &.{"glib-2.0"},
+    };
+
+    pub const gmodule2: Library = .{
+        .system_libraries = &.{"gmodule-2.0"},
+    };
+
+    pub const gstapp1: Library = .{
+        .system_libraries = &.{"gstreamer-app-1.0"},
+    };
+
     pub const adw1: Library = .{
         .system_libraries = &.{"libadwaita-1"},
     };
@@ -551,14 +632,6 @@ pub const libraries = struct {
 
     pub const graphene1: Library = .{
         .system_libraries = &.{"graphene-gobject-1.0"},
-    };
-
-    pub const gobject2: Library = .{
-        .system_libraries = &.{"gobject-2.0"},
-    };
-
-    pub const glib2: Library = .{
-        .system_libraries = &.{"glib-2.0"},
     };
 
     pub const gdk4: Library = .{
@@ -587,10 +660,6 @@ pub const libraries = struct {
 
     pub const gio2: Library = .{
         .system_libraries = &.{"gio-2.0"},
-    };
-
-    pub const gmodule2: Library = .{
-        .system_libraries = &.{"gmodule-2.0"},
     };
 
     pub const gdkpixbuf2: Library = .{

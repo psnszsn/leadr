@@ -10,6 +10,7 @@ pub const Action = union(enum) {
     group: []const Binding,
     sticky: struct { bindings: []const Binding, timeout_ms: c_uint },
     emoji,
+    dictation,
     quit,
 };
 

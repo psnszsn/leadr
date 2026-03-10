@@ -8,5 +8,9 @@
         .gobject = .{
             .path = "bindings",
         },
+        .@"whisper.cpp" = .{
+            .url = "git+https://github.com/ggml-org/whisper.cpp.git#30c5194c9691e4e9a98b3dea9f19727397d3f46e",
+            .hash = "N-V-__8AADLE2wGeJhHWqXL4dq5IkH_TSsPrCaw_v4RiIn6_",
+        },
     },
 }

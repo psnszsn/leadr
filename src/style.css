@@ -69,3 +69,13 @@
     min-width: 40px;
     min-height: 40px;
 }
+
+.dictation {
+    background: alpha(@window_bg_color, 0.92);
+    border-radius: 16px;
+}
+
+.dictation-status {
+    font-size: 18px;
+    opacity: 0.7;
+}
