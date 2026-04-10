@@ -8,7 +8,7 @@ pub const bindings: []const config.Binding = &.{
     } } },
     .{ .key = 'f', .label = "Focus", .action = .{ .group = &.{
         .{ .key = 'b', .label = "Browser", .action = .{ .command =
-            \\sh -c 'niri msg -j windows | jq "map(select(.app_id==\"Firefox\")) | first | .id" | xargs niri msg action focus-window --id'
+            \\sh -c 'niri msg -j windows | jq "map(select(.app_id==\"firefox\")) | first | .id" | xargs niri msg action focus-window --id'
         } },
         .{ .key = 'p', .label = "Ghostty", .action = .{ .command =
             \\sh -c 'niri msg -j windows | jq "[.[] | select(.app_id==\"com.mitchellh.ghostty\" and (.is_focused | not))] | sort_by(.focus_timestamp.secs, .focus_timestamp.nanos) | reverse | first | .id // empty" | xargs -r niri msg action focus-window --id'
@@ -48,6 +48,12 @@ pub const bindings: []const config.Binding = &.{
         .{ .key = 'n', .label = "Next", .action = .{ .command = "playerctl next" } },
         .{ .key = 'b', .label = "Previous", .action = .{ .command = "playerctl previous" } },
     } } },
+    .{ .key = 'b', .label = "Browser", .action = .{ .command =
+        \\sh -c 'niri msg -j windows | jq "map(select(.app_id==\"firefox\")) | first | .id" | xargs niri msg action focus-window --id'
+    } },
+    .{ .key = 'g', .label = "Ghostty", .action = .{ .command =
+        \\sh -c 'niri msg -j windows | jq "[.[] | select(.app_id==\"com.mitchellh.ghostty\" and (.is_focused | not))] | sort_by(.focus_timestamp.secs, .focus_timestamp.nanos) | reverse | first | .id // empty" | xargs -r niri msg action focus-window --id'
+    } },
     .{ .key = 'x', .label = "Close Window", .action = .{ .command = "niri msg action close-window" } },
     .{ .key = 'e', .label = "Emoji", .action = .emoji },
     .{ .key = 'v', .label = "Voice", .action = .dictation },

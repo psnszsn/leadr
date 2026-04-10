@@ -1,11 +1,10 @@
 const std = @import("std");
 const gdk = @import("gdk");
-const glib = @import("glib");
 const gobject = @import("gobject");
 const gtk = @import("gtk");
 
 const Common = @import("../class.zig").Common;
-const EmojiData = @import("../emoji_data.zig");
+const emojis = @import("../emojis.zig");
 const layer_shell = @import("gtk4_layer_shell");
 
 pub const EmojiPicker = extern struct {
@@ -26,7 +25,6 @@ pub const EmojiPicker = extern struct {
         emoji_flow: *gtk.FlowBox,
         preview_glyph: *gtk.Label,
         preview_name: *gtk.Label,
-        emoji_data: ?EmojiData.EmojiList = null,
 
         pub var offset: c_int = 0;
     };
@@ -47,6 +45,7 @@ pub const EmojiPicker = extern struct {
 
         // Key event controller for Escape
         const key_controller = gtk.EventControllerKey.new();
+        key_controller.as(gtk.EventController).setPropagationPhase(.capture);
         _ = gtk.EventControllerKey.signals.key_pressed.connect(
             key_controller,
             *Self,
@@ -56,14 +55,8 @@ pub const EmojiPicker = extern struct {
         );
         self.as(gtk.Widget).addController(key_controller.as(gtk.EventController));
 
-        // Load emoji data
-        const emoji_list = EmojiData.EmojiList.load(std.heap.page_allocator) catch {
-            return;
-        };
-        priv.emoji_data = emoji_list;
-
         // Populate FlowBox
-        for (emoji_list.emojis, 0..) |emoji, i| {
+        for (&emojis.emoji_list, 0..) |emoji, i| {
             const label: *gtk.Label = .new(emoji.glyph);
             label.as(gtk.Widget).addCssClass("emoji-cell");
             // Store index as widget name for retrieval
@@ -169,7 +162,6 @@ pub const EmojiPicker = extern struct {
             const search_widget = priv.search_entry.as(gtk.Widget);
             if (search_widget.hasFocus() == 0) {
                 _ = search_widget.grabFocus();
-                // If it's a printable character, let it propagate to the now-focused entry
             }
         }
 
@@ -192,10 +184,9 @@ pub const EmojiPicker = extern struct {
         const name_ptr: [*:0]const u8 = first_child.getName();
         const name_slice = std.mem.span(name_ptr);
         const idx = std.fmt.parseInt(usize, name_slice, 10) catch return;
-        const emoji_data = priv.emoji_data orelse return;
-        if (idx >= emoji_data.emojis.len) return;
-        priv.preview_glyph.setLabel(emoji_data.emojis[idx].glyph);
-        priv.preview_name.setLabel(emoji_data.emojis[idx].name);
+        if (idx >= emojis.emoji_list.len) return;
+        priv.preview_glyph.setLabel(emojis.emoji_list[idx].glyph);
+        priv.preview_name.setLabel(emojis.emoji_list[idx].name);
     }
 
     fn onMotion(
@@ -260,9 +251,6 @@ pub const EmojiPicker = extern struct {
         child: *gtk.FlowBoxChild,
         self: *Self,
     ) callconv(.c) void {
-        const priv = private(self);
-        const emoji_data = priv.emoji_data orelse return;
-
         // Get index from widget name
         const widget = child.as(gtk.Widget);
         const first_child = widget.getFirstChild() orelse return;
@@ -270,9 +258,9 @@ pub const EmojiPicker = extern struct {
         const name_slice = std.mem.span(name_ptr);
 
         const idx = std.fmt.parseInt(usize, name_slice, 10) catch return;
-        if (idx >= emoji_data.emojis.len) return;
+        if (idx >= emojis.emoji_list.len) return;
 
-        const glyph = emoji_data.emojis[idx].glyph;
+        const glyph = emojis.emoji_list[idx].glyph;
 
         // Copy to clipboard
         const display = gdk.Display.getDefault() orelse return;
@@ -292,11 +280,6 @@ pub const EmojiPicker = extern struct {
     }
 
     fn finalize(self: *Self) callconv(.c) void {
-        const priv = private(self);
-        if (priv.emoji_data) |*data| {
-            data.deinit();
-            priv.emoji_data = null;
-        }
         gobject.Object.virtual_methods.finalize.call(
             Class.parent,
             self.as(Parent),
