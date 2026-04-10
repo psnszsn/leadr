@@ -57,7 +57,7 @@ pub const EmojiPicker = extern struct {
         self.as(gtk.Widget).addController(key_controller.as(gtk.EventController));
 
         // Load emoji data
-        var emoji_list = EmojiData.EmojiList.load(std.heap.page_allocator) catch {
+        const emoji_list = EmojiData.EmojiList.load(std.heap.page_allocator) catch {
             return;
         };
         priv.emoji_data = emoji_list;
