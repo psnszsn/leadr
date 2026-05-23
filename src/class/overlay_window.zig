@@ -111,8 +111,13 @@ pub const OverlayWindow = extern struct {
                 },
                 .command => |cmd| {
                     if (priv.sticky_timeout_ms != 0) {
-                        // In sticky mode: execute but stay open, reset timer
-                        spawnCommand(cmd);
+                        // In sticky mode: release keyboard exclusivity,
+                        // run the command synchronously so the WM processes
+                        // it before we reclaim the keyboard.
+                        const window = self.as(gtk.Window);
+                        layer_shell.setKeyboardMode(window, .none);
+                        spawnCommandSync(cmd);
+                        layer_shell.setKeyboardMode(window, .exclusive);
                         resetStickyTimer(self);
                     } else {
                         self.hideOverlay();
@@ -166,6 +171,14 @@ pub const OverlayWindow = extern struct {
         priv.sticky_timer = 0;
         self.hideOverlay();
         return 0; // G_SOURCE_REMOVE
+    }
+
+    fn spawnCommandSync(cmd: []const u8) void {
+        var buf: [4096:0]u8 = undefined;
+        if (cmd.len >= buf.len) return;
+        @memcpy(buf[0..cmd.len], cmd);
+        buf[cmd.len] = 0;
+        _ = glib.spawnCommandLineSync(&buf, null, null, null, null);
     }
 
     fn spawnCommand(cmd: []const u8) void {

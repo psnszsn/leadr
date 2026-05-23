@@ -7,54 +7,46 @@ pub const bindings: []const config.Binding = &.{
         .{ .key = 'e', .label = "Editor", .action = .{ .command = "ghostty -e nvim" } },
     } } },
     .{ .key = 'f', .label = "Focus", .action = .{ .group = &.{
-        .{ .key = 'b', .label = "Browser", .action = .{ .command =
-            \\sh -c 'niri msg -j windows | jq "map(select(.app_id==\"firefox\")) | first | .id" | xargs niri msg action focus-window --id'
-        } },
-        .{ .key = 'p', .label = "Ghostty", .action = .{ .command =
-            \\sh -c 'niri msg -j windows | jq "[.[] | select(.app_id==\"com.mitchellh.ghostty\" and (.is_focused | not))] | sort_by(.focus_timestamp.secs, .focus_timestamp.nanos) | reverse | first | .id // empty" | xargs -r niri msg action focus-window --id'
-        } },
+        .{ .key = 'b', .label = "Browser", .action = .{ .command = "hyprctl dispatch 'hl.dsp.focus({ window = \"class:firefox\" })'" } },
+        .{ .key = 'p', .label = "Ghostty", .action = .{ .command = "hyprctl dispatch 'hl.dsp.focus({ window = \"class:com.mitchellh.ghostty\" })'" } },
     } } },
     .{ .key = 'w', .label = "Window", .action = .{ .sticky = .{
         .bindings = &.{
-            .{ .key = 'm', .label = "Focus Left", .action = .{ .command = "niri msg action focus-column-or-monitor-left" } },
-            .{ .key = 'n', .label = "Focus Down", .action = .{ .command = "niri msg action focus-window-or-workspace-down" } },
-            .{ .key = 'e', .label = "Focus Up", .action = .{ .command = "niri msg action focus-window-or-workspace-up" } },
-            .{ .key = 'i', .label = "Focus Right", .action = .{ .command = "niri msg action focus-column-or-monitor-right" } },
+            .{ .key = 'm', .label = "Focus Left", .action = .{ .command = "hyprctl dispatch 'hl.dsp.focus({ direction = \"l\" })'" } },
+            .{ .key = 'n', .label = "Focus Down", .action = .{ .command = "hyprctl dispatch 'hl.dsp.focus({ direction = \"d\" })'" } },
+            .{ .key = 'e', .label = "Focus Up", .action = .{ .command = "hyprctl dispatch 'hl.dsp.focus({ direction = \"u\" })'" } },
+            .{ .key = 'i', .label = "Focus Right", .action = .{ .command = "hyprctl dispatch 'hl.dsp.focus({ direction = \"r\" })'" } },
         },
         .timeout_ms = 1500,
     } } },
     .{ .key = 'd', .label = "Displace", .action = .{ .sticky = .{
         .bindings = &.{
-            .{ .key = 'm', .label = "Move Left", .action = .{ .command = "niri msg action move-column-left" } },
-            .{ .key = 'n', .label = "Move Down", .action = .{ .command = "niri msg action move-window-down-or-to-workspace-down" } },
-            .{ .key = 'e', .label = "Move Up", .action = .{ .command = "niri msg action move-window-up-or-to-workspace-up" } },
-            .{ .key = 'i', .label = "Move Right", .action = .{ .command = "niri msg action move-column-right" } },
+            .{ .key = 'm', .label = "Move Left", .action = .{ .command = "hyprctl dispatch 'hl.dsp.window.move({ direction = \"l\" })'" } },
+            .{ .key = 'n', .label = "Move Down", .action = .{ .command = "hyprctl dispatch 'hl.dsp.window.move({ direction = \"d\" })'" } },
+            .{ .key = 'e', .label = "Move Up", .action = .{ .command = "hyprctl dispatch 'hl.dsp.window.move({ direction = \"u\" })'" } },
+            .{ .key = 'i', .label = "Move Right", .action = .{ .command = "hyprctl dispatch 'hl.dsp.window.move({ direction = \"r\" })'" } },
         },
         .timeout_ms = 1500,
     } } },
     .{ .key = 'l', .label = "Layout", .action = .{ .group = &.{
-        .{ .key = 'f', .label = "Maximize", .action = .{ .command = "niri msg action maximize-column" } },
-        .{ .key = 'g', .label = "Fullscreen", .action = .{ .command = "niri msg action fullscreen-window" } },
-        .{ .key = 'c', .label = "Center", .action = .{ .command = "niri msg action center-column" } },
-        .{ .key = 'r', .label = "Preset Width", .action = .{ .command = "niri msg action switch-preset-column-width" } },
+        .{ .key = 'f', .label = "Maximize", .action = .{ .command = "hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = \"maximized\", action = \"toggle\" })'" } },
+        .{ .key = 'g', .label = "Fullscreen", .action = .{ .command = "hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = \"fullscreen\", action = \"toggle\" })'" } },
+        .{ .key = 'c', .label = "Center", .action = .{ .command = "hyprctl dispatch 'hl.dsp.window.center()'" } },
+        .{ .key = 'r', .label = "Toggle Float", .action = .{ .command = "hyprctl dispatch 'hl.dsp.window.float({ action = \"toggle\" })'" } },
     } } },
     .{ .key = 's', .label = "Screenshot", .action = .{ .group = &.{
-        .{ .key = 's', .label = "Select", .action = .{ .command = "niri msg action screenshot" } },
-        .{ .key = 'w', .label = "Window", .action = .{ .command = "niri msg action screenshot-window" } },
-        .{ .key = 'm', .label = "Monitor", .action = .{ .command = "niri msg action screenshot-screen" } },
+        .{ .key = 's', .label = "Select", .action = .{ .command = "grimblast copy area" } },
+        .{ .key = 'w', .label = "Window", .action = .{ .command = "grimblast copy active" } },
+        .{ .key = 'm', .label = "Monitor", .action = .{ .command = "grimblast copy output" } },
     } } },
     .{ .key = 'p', .label = "Player", .action = .{ .group = &.{
         .{ .key = 'p', .label = "Play/Pause", .action = .{ .command = "playerctl play-pause" } },
         .{ .key = 'n', .label = "Next", .action = .{ .command = "playerctl next" } },
         .{ .key = 'b', .label = "Previous", .action = .{ .command = "playerctl previous" } },
     } } },
-    .{ .key = 'b', .label = "Browser", .action = .{ .command =
-        \\sh -c 'niri msg -j windows | jq "map(select(.app_id==\"firefox\")) | first | .id" | xargs niri msg action focus-window --id'
-    } },
-    .{ .key = 'g', .label = "Ghostty", .action = .{ .command =
-        \\sh -c 'niri msg -j windows | jq "[.[] | select(.app_id==\"com.mitchellh.ghostty\" and (.is_focused | not))] | sort_by(.focus_timestamp.secs, .focus_timestamp.nanos) | reverse | first | .id // empty" | xargs -r niri msg action focus-window --id'
-    } },
-    .{ .key = 'x', .label = "Close Window", .action = .{ .command = "niri msg action close-window" } },
+    .{ .key = 'b', .label = "Browser", .action = .{ .command = "hyprctl dispatch 'hl.dsp.focus({ window = \"class:firefox\" })'" } },
+    .{ .key = 'g', .label = "Ghostty", .action = .{ .command = "hyprctl dispatch 'hl.dsp.focus({ window = \"class:com.mitchellh.ghostty\" })'" } },
+    .{ .key = 'x', .label = "Close Window", .action = .{ .command = "hyprctl dispatch 'hl.dsp.window.close()'" } },
     .{ .key = 'e', .label = "Emoji", .action = .emoji },
     .{ .key = 'v', .label = "Voice", .action = .dictation },
     .{ .key = 'q', .label = "Quit", .action = .quit },
