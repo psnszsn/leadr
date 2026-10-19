@@ -2849,9 +2849,10 @@ pub const PathBuilder = opaque {
 
     /// Creates a new path from the given builder.
     ///
-    /// The given `GskPathBuilder` is reset once this function returns;
-    /// you cannot call this function multiple times on the same builder
-    /// instance.
+    /// The given `GskPathBuilder` is reset to the initial state once this
+    /// function returns. Calling this function again on the same builder
+    /// instance will therefore produce an empty path, not a copy of the same
+    /// path.
     ///
     /// This function is intended primarily for language bindings.
     /// C code should use `gsk.PathBuilder.freeToPath`.
@@ -3541,7 +3542,7 @@ pub const Transform = opaque {
     ///     gsk_transform_skew (
     ///         gsk_transform_scale (
     ///             gsk_transform_rotate (
-    ///                 gsk_transform_translate (NULL, &GRAPHENE_POINT_T (dx, dy)),
+    ///                 gsk_transform_translate (NULL, &GRAPHENE_POINT_INIT (dx, dy)),
     ///                 angle),
     ///             scale_x, scale_y),
     ///         skew_x, skew_y)

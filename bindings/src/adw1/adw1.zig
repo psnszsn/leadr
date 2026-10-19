@@ -11820,7 +11820,7 @@ pub const PropertyAnimationTarget = opaque {
 ///
 /// ## Accessibility
 ///
-/// `AdwShortcutLabel` uses the `GTK_ACCESSIBLE_ROLE_GENERIC` role.
+/// `AdwShortcutLabel` uses the `GTK_ACCESSIBLE_ROLE_LABEL` role.
 ///
 /// See also: `ShortcutsDialog`.
 pub const ShortcutLabel = opaque {
@@ -22307,12 +22307,12 @@ pub const DURATION_INFINITE = 4294967295;
 /// Adwaita major version component (e.g. 1 if the version is 1.2.3).
 pub const MAJOR_VERSION = 1;
 /// Adwaita micro version component (e.g. 3 if the version is 1.2.3).
-pub const MICRO_VERSION = 1;
+pub const MICRO_VERSION = 4;
 /// Adwaita minor version component (e.g. 2 if the version is 1.2.3).
 pub const MINOR_VERSION = 8;
 /// Adwaita version, encoded as a string, useful for printing and
 /// concatenation.
-pub const VERSION_S = "1.8.1";
+pub const VERSION_S = "1.8.4";
 
 test {
     @setEvalBranchQuota(100_000);

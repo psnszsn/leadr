@@ -5827,9 +5827,9 @@ pub const UNICODE_MAX = 1114111;
 /// See Unicode 6.1 for details on the maximum decomposition length.
 pub const UNICODE_MAX_DECOMPOSITION_LEN = 19;
 pub const VERSION_MAJOR = 12;
-pub const VERSION_MICRO = 2;
+pub const VERSION_MICRO = 0;
 pub const VERSION_MINOR = 3;
-pub const VERSION_STRING = "12.3.2";
+pub const VERSION_STRING = "12.3.0";
 
 test {
     @setEvalBranchQuota(100_000);

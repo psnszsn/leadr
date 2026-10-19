@@ -25612,7 +25612,7 @@ pub const HookCompareFunc = *const fn (p_new_hook: *glib.Hook, p_sibling: *glib.
 
 /// Defines the type of function to be called when a hook in a
 /// list of hooks gets finalized.
-pub const HookFinalizeFunc = *const fn (p_hook_list: *anyopaque, p_hook: *glib.Hook) callconv(.c) void;
+pub const HookFinalizeFunc = *const fn (p_hook_list: *glib.HookList, p_hook: *glib.Hook) callconv(.c) void;
 
 /// Defines the type of the function passed to `glib.Hook.find`.
 pub const HookFindFunc = *const fn (p_hook: *glib.Hook, p_data: ?*anyopaque) callconv(.c) c_int;
@@ -25700,7 +25700,7 @@ pub const PrintFunc = *const fn (p_string: [*:0]const u8) callconv(.c) void;
 pub const RegexEvalCallback = *const fn (p_match_info: *const glib.MatchInfo, p_result: *glib.String, p_user_data: ?*anyopaque) callconv(.c) c_int;
 
 /// Specifies the type of the message handler function.
-pub const ScannerMsgFunc = *const fn (p_scanner: *anyopaque, p_message: [*:0]u8, p_error: c_int) callconv(.c) void;
+pub const ScannerMsgFunc = *const fn (p_scanner: *glib.Scanner, p_message: [*:0]u8, p_error: c_int) callconv(.c) void;
 
 /// A `glib.SequenceIterCompareFunc` is a function used to compare iterators.
 /// It must return zero if the iterators compare equal, a negative value
@@ -26142,7 +26142,7 @@ pub const MAXUINT8 = 255;
 /// Like `gtk_micro_version`, but from the headers used at
 /// application compile time, rather than from the library
 /// linked against at application run time.
-pub const MICRO_VERSION = 1;
+pub const MICRO_VERSION = 3;
 /// The minimum value which can be held in a `gint16`.
 pub const MININT16 = -32768;
 /// The minimum value which can be held in a `gint32`.

@@ -103,7 +103,7 @@ const gmodule = @import("gmodule2");
 /// serialized via the pad's STREAM_LOCK.
 ///
 /// Note that `gstbase.Adapter.push` takes ownership of the buffer passed. Use
-/// `gst.Buffer.ref` before pushing it into the adapter if you still want to
+/// `gst_buffer_ref` before pushing it into the adapter if you still want to
 /// access the buffer later. The adapter will never modify the data in the
 /// buffer pushed in it.
 pub const Adapter = opaque {
@@ -184,7 +184,7 @@ pub const Adapter = opaque {
     /// does not flush them from the adapter. See `gstbase.Adapter.takeBuffer`
     /// for details.
     ///
-    /// Caller owns a reference to the returned buffer. `gst.Buffer.unref` after
+    /// Caller owns a reference to the returned buffer. `gst_buffer_unref` after
     /// usage.
     ///
     /// Free-function: gst_buffer_unref
@@ -195,7 +195,7 @@ pub const Adapter = opaque {
     /// does not flush them from the adapter. See `gstbase.Adapter.takeBufferFast`
     /// for details.
     ///
-    /// Caller owns a reference to the returned buffer. `gst.Buffer.unref` after
+    /// Caller owns a reference to the returned buffer. `gst_buffer_unref` after
     /// usage.
     ///
     /// Free-function: gst_buffer_unref
@@ -206,7 +206,7 @@ pub const Adapter = opaque {
     /// the `adapter` but does not flush them from the adapter. See
     /// `gstbase.Adapter.takeBufferList` for details.
     ///
-    /// Caller owns the returned list. Call `gst.BufferList.unref` to free
+    /// Caller owns the returned list. Call `gst_buffer_list_unref` to free
     /// the list after usage.
     extern fn gst_adapter_get_buffer_list(p_adapter: *Adapter, p_nbytes: usize) ?*gst.BufferList;
     pub const getBufferList = gst_adapter_get_buffer_list;
@@ -215,7 +215,7 @@ pub const Adapter = opaque {
     /// `adapter`, but does not flush them from the adapter. See
     /// `gstbase.Adapter.takeList` for details.
     ///
-    /// Caller owns returned list and contained buffers. `gst.Buffer.unref` each
+    /// Caller owns returned list and contained buffers. `gst_buffer_unref` each
     /// buffer in the list before freeing the list after usage.
     extern fn gst_adapter_get_list(p_adapter: *Adapter, p_nbytes: usize) ?*glib.List;
     pub const getList = gst_adapter_get_list;
@@ -358,7 +358,7 @@ pub const Adapter = opaque {
     /// Since 1.6 this will also copy over all GstMeta of the input buffers except
     /// for meta with the `GST_META_FLAG_POOLED` flag or with the "memory" tag.
     ///
-    /// Caller owns a reference to the returned buffer. `gst.Buffer.unref` after
+    /// Caller owns a reference to the returned buffer. `gst_buffer_unref` after
     /// usage.
     ///
     /// Free-function: gst_buffer_unref
@@ -384,7 +384,7 @@ pub const Adapter = opaque {
     /// This function can return buffer up to the return value of
     /// `gstbase.Adapter.available` without making copies if possible.
     ///
-    /// Caller owns a reference to the returned buffer. `gst.Buffer.unref` after
+    /// Caller owns a reference to the returned buffer. `gst_buffer_unref` after
     /// usage.
     ///
     /// Free-function: gst_buffer_unref
@@ -396,7 +396,7 @@ pub const Adapter = opaque {
     /// When the caller can deal with individual buffers, this function is more
     /// performant because no memory should be copied.
     ///
-    /// Caller owns the returned list. Call `gst.BufferList.unref` to free
+    /// Caller owns the returned list. Call `gst_buffer_list_unref` to free
     /// the list after usage.
     extern fn gst_adapter_take_buffer_list(p_adapter: *Adapter, p_nbytes: usize) ?*gst.BufferList;
     pub const takeBufferList = gst_adapter_take_buffer_list;
@@ -406,7 +406,7 @@ pub const Adapter = opaque {
     /// When the caller can deal with individual buffers, this function is more
     /// performant because no memory should be copied.
     ///
-    /// Caller owns returned list and contained buffers. `gst.Buffer.unref` each
+    /// Caller owns returned list and contained buffers. `gst_buffer_unref` each
     /// buffer in the list before freeing the list after usage.
     extern fn gst_adapter_take_list(p_adapter: *Adapter, p_nbytes: usize) ?*glib.List;
     pub const takeList = gst_adapter_take_list;

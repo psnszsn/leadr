@@ -108,6 +108,9 @@ pub const getNamespace = gtk_layer_get_namespace;
 extern fn gtk_layer_get_protocol_version() c_uint;
 pub const getProtocolVersion = gtk_layer_get_protocol_version;
 
+extern fn gtk_layer_get_respect_close(p_window: *gtk.Window) c_int;
+pub const getRespectClose = gtk_layer_get_respect_close;
+
 extern fn gtk_layer_get_zwlr_layer_surface_v1(p_window: *gtk.Window) ?*anyopaque;
 pub const getZwlrLayerSurfaceV1 = gtk_layer_get_zwlr_layer_surface_v1;
 
@@ -180,6 +183,15 @@ pub const setMonitor = gtk_layer_set_monitor;
 /// Default is "gtk4-layer-shell" (which will be used if set to `NULL`)
 extern fn gtk_layer_set_namespace(p_window: *gtk.Window, p_name_space: ?[*:0]const u8) void;
 pub const setNamespace = gtk_layer_set_namespace;
+
+/// Compositors may send the `zwlr_layer_surface_v1.closed` event in some cases (such as
+/// when an output is destroyed). Prior to v1.3 this always triggered a GTK `close-request`
+/// signal, which would destroy the window if not intercepted by application code. In v1.3+
+/// this behavior is disabled by default, and can be turned back on by calling this
+/// function with `TRUE`. To handle the `.closed` event without destroying your window
+/// turn respect_close on and connect a `close-request` listener that returns `TRUE`.
+extern fn gtk_layer_set_respect_close(p_window: *gtk.Window, p_respect_close: c_int) void;
+pub const setRespectClose = gtk_layer_set_respect_close;
 
 test {
     @setEvalBranchQuota(100_000);

@@ -20,10 +20,11 @@
       in {
         default = pkgs.mkShell {
           nativeBuildInputs = [
-            zig.packages.${system}."0.16.0"
+            zig.packages.${system}."0.17.0"
             pkgs.blueprint-compiler
             pkgs.pkg-config
             pkgs.libxml2
+            pkgs.libxslt
             pkgs.gtk4
             pkgs.glib
             pkgs.libadwaita

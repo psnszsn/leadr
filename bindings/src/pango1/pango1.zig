@@ -3129,6 +3129,9 @@ pub const FontDescription = opaque {
     /// "Not-Rotated", "South", "Upside-Down", "North", "Rotated-Left",
     /// "East", "Rotated-Right", "West".
     ///
+    /// The following words are understood as color values:
+    /// "With-Color", "Without-Color".
+    ///
     /// VARIATIONS is a comma-separated list of font variations
     /// of the form @‍axis1=value,axis2=value,...
     ///
@@ -3192,6 +3195,13 @@ pub const FontDescription = opaque {
     /// Frees a font description.
     extern fn pango_font_description_free(p_desc: ?*FontDescription) void;
     pub const free = pango_font_description_free;
+
+    /// Returns the color field of the font description.
+    ///
+    /// This field determines whether the font description should
+    /// match fonts that have color glyphs, or fonts that don't.
+    extern fn pango_font_description_get_color(p_desc: *const FontDescription) pango.FontColor;
+    pub const getColor = pango_font_description_get_color;
 
     /// Gets the family name field of a font description.
     ///
@@ -3293,6 +3303,13 @@ pub const FontDescription = opaque {
     /// which sets the font size in points.
     extern fn pango_font_description_set_absolute_size(p_desc: *FontDescription, p_size: f64) void;
     pub const setAbsoluteSize = pango_font_description_set_absolute_size;
+
+    /// Sets the color field of a font description.
+    ///
+    /// This field determines whether the font description should
+    /// match fonts that have color glyphs, or fonts that don't.
+    extern fn pango_font_description_set_color(p_desc: *FontDescription, p_color: pango.FontColor) void;
+    pub const setColor = pango_font_description_set_color;
 
     /// Sets the family name field of a font description.
     ///
@@ -5322,6 +5339,22 @@ pub const EllipsizeMode = enum(c_int) {
     }
 };
 
+/// Specifies whether a font should or should not have color glyphs.
+pub const FontColor = enum(c_int) {
+    forbidden = 0,
+    required = 1,
+    dont_care = 2,
+    _,
+
+    extern fn pango_font_color_get_type() usize;
+    pub const getGObjectType = pango_font_color_get_type;
+
+    test {
+        @setEvalBranchQuota(100_000);
+        std.testing.refAllDecls(@This());
+    }
+};
+
 /// An enumeration that affects font sizes for superscript
 /// and subscript positioning and for (emulated) Small Caps.
 pub const FontScale = enum(c_int) {
@@ -5852,7 +5885,7 @@ pub const FontMask = packed struct(c_uint) {
     gravity: bool = false,
     variations: bool = false,
     features: bool = false,
-    _padding9: bool = false,
+    color: bool = false,
     _padding10: bool = false,
     _padding11: bool = false,
     _padding12: bool = false,
@@ -5885,6 +5918,7 @@ pub const FontMask = packed struct(c_uint) {
     pub const flags_gravity: FontMask = @bitCast(@as(c_uint, 64));
     pub const flags_variations: FontMask = @bitCast(@as(c_uint, 128));
     pub const flags_features: FontMask = @bitCast(@as(c_uint, 256));
+    pub const flags_color: FontMask = @bitCast(@as(c_uint, 512));
     extern fn pango_font_mask_get_type() usize;
     pub const getGObjectType = pango_font_mask_get_type;
 
@@ -6770,11 +6804,11 @@ pub const SCALE = 1024;
 /// The major component of the version of Pango available at compile-time.
 pub const VERSION_MAJOR = 1;
 /// The micro component of the version of Pango available at compile-time.
-pub const VERSION_MICRO = 4;
+pub const VERSION_MICRO = 0;
 /// The minor component of the version of Pango available at compile-time.
-pub const VERSION_MINOR = 56;
+pub const VERSION_MINOR = 57;
 /// A string literal containing the version of Pango available at compile-time.
-pub const VERSION_STRING = "1.56.4";
+pub const VERSION_STRING = "1.57.0";
 
 test {
     @setEvalBranchQuota(100_000);

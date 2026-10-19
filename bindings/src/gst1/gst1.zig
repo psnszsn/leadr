@@ -1261,7 +1261,7 @@ pub const Bus = extern struct {
     /// The bus watch will only work if a `glib.MainLoop` is being run.
     ///
     /// When `func` is called, the message belongs to the caller; if you want to
-    /// keep a copy of it, call `gst.Message.ref` before leaving `func`.
+    /// keep a copy of it, call `gst_message_ref` before leaving `func`.
     ///
     /// The watch can be removed using `gst.Bus.removeWatch` or by returning `FALSE`
     /// from `func`. If the watch was added to the default main context it is also
@@ -3089,7 +3089,7 @@ pub const Element = extern struct {
         /// downstream events or a random linked source pad for upstream events.
         ///
         /// This function takes ownership of the provided event so you should
-        /// `gst.Event.ref` it if you want to reuse the event after this call.
+        /// `gst_event_ref` it if you want to reuse the event after this call.
         ///
         /// MT safe.
         pub const send_event = struct {
@@ -3807,7 +3807,7 @@ pub const Element = extern struct {
     /// downstream events or a random linked source pad for upstream events.
     ///
     /// This function takes ownership of the provided event so you should
-    /// `gst.Event.ref` it if you want to reuse the event after this call.
+    /// `gst_event_ref` it if you want to reuse the event after this call.
     ///
     /// MT safe.
     extern fn gst_element_send_event(p_element: *Element, p_event: *gst.Event) c_int;
@@ -5109,7 +5109,7 @@ pub const Pad = extern struct {
     ///
     /// If `buffer` points to a variable holding `NULL`, a valid new `gst.Buffer` will be
     /// placed in `buffer` when this function returns `GST_FLOW_OK`. The new buffer
-    /// must be freed with `gst.Buffer.unref` after usage.
+    /// must be freed with `gst_buffer_unref` after usage.
     ///
     /// When `buffer` points to a variable that points to a valid `gst.Buffer`, the
     /// buffer will be filled with the result data when this function returns
@@ -5326,7 +5326,7 @@ pub const Pad = extern struct {
     ///
     /// If `buffer` points to a variable holding `NULL`, a valid new `gst.Buffer` will be
     /// placed in `buffer` when this function returns `GST_FLOW_OK`. The new buffer
-    /// must be freed with `gst.Buffer.unref` after usage. When this function
+    /// must be freed with `gst_buffer_unref` after usage. When this function
     /// returns any other result value, `buffer` will still point to `NULL`.
     ///
     /// When `buffer` points to a variable that points to a valid `gst.Buffer`, the
@@ -5361,7 +5361,7 @@ pub const Pad = extern struct {
     /// elements.
     ///
     /// This function takes ownership of the provided event so you should
-    /// `gst.Event.ref` it if you want to reuse the event after this call.
+    /// `gst_event_ref` it if you want to reuse the event after this call.
     extern fn gst_pad_push_event(p_pad: *Pad, p_event: *gst.Event) c_int;
     pub const pushEvent = gst_pad_push_event;
 
@@ -5461,7 +5461,7 @@ pub const Pad = extern struct {
     /// all necessary locks and checks.
     ///
     /// This function takes ownership of the provided event so you should
-    /// `gst.Event.ref` it if you want to reuse the event after this call.
+    /// `gst_event_ref` it if you want to reuse the event after this call.
     extern fn gst_pad_send_event(p_pad: *Pad, p_event: *gst.Event) c_int;
     pub const sendEvent = gst_pad_send_event;
 
@@ -8599,7 +8599,7 @@ pub const BinPrivate = opaque {
 /// know the media type of the buffer (the preceding CAPS event). Either or both
 /// can be set to `GST_BUFFER_OFFSET_NONE`.
 ///
-/// `gst.Buffer.ref` is used to increase the refcount of a buffer. This must be
+/// `gst_buffer_ref` is used to increase the refcount of a buffer. This must be
 /// done when you want to keep a handle to the buffer after pushing it to the
 /// next element. The buffer refcount determines the writability of the buffer, a
 /// buffer is only writable when the refcount is exactly 1, i.e. when the caller
@@ -8628,7 +8628,7 @@ pub const BinPrivate = opaque {
 /// An element should either unref the buffer or push it out on a src pad
 /// using `gst.Pad.push` (see `gst.Pad`).
 ///
-/// Buffers are usually freed by unreffing them with `gst.Buffer.unref`. When
+/// Buffers are usually freed by unreffing them with `gst_buffer_unref`. When
 /// the refcount drops to 0, any memory and metadata pointed to by the buffer is
 /// unreffed as well. Buffers allocated from a `gst.BufferPool` will be returned to
 /// the pool when the refcount drops to 0.
@@ -8674,15 +8674,6 @@ pub const Buffer = extern struct {
     /// together to make room for the new block.
     extern fn gst_buffer_get_max_memory() c_uint;
     pub const getMaxMemory = gst_buffer_get_max_memory;
-
-    /// Modifies a pointer to a `gst.Buffer` to point to a different `gst.Buffer`. The
-    /// modification is done atomically (so this is useful for ensuring thread safety
-    /// in some cases), and the reference counts are updated appropriately (the old
-    /// buffer is unreffed, the new is reffed).
-    ///
-    /// Either `nbuf` or the `gst.Buffer` pointed to by `obuf` may be `NULL`.
-    extern fn gst_buffer_replace(p_obuf: ?**gst.Buffer, p_nbuf: ?*gst.Buffer) c_int;
-    pub const replace = gst_buffer_replace;
 
     /// Creates a newly allocated buffer without any data.
     extern fn gst_buffer_new() *gst.Buffer;
@@ -8765,14 +8756,6 @@ pub const Buffer = extern struct {
     /// `buf2`.
     extern fn gst_buffer_append_region(p_buf1: *Buffer, p_buf2: *gst.Buffer, p_offset: isize, p_size: isize) *gst.Buffer;
     pub const appendRegion = gst_buffer_append_region;
-
-    /// Creates a copy of the given buffer. This will only copy the buffer's
-    /// data to a newly allocated memory if needed (if the type of memory
-    /// requires it), otherwise the underlying data is just referenced.
-    /// Check `gst.Buffer.copyDeep` if you want to force the data
-    /// to be copied to newly allocated memory.
-    extern fn gst_buffer_copy(p_buf: *const Buffer) ?*gst.Buffer;
-    pub const copy = gst_buffer_copy;
 
     /// Creates a copy of the given buffer. This will make a newly allocated
     /// copy of the data the source buffer contains.
@@ -9003,16 +8986,6 @@ pub const Buffer = extern struct {
     extern fn gst_buffer_prepend_memory(p_buffer: *Buffer, p_mem: *gst.Memory) void;
     pub const prependMemory = gst_buffer_prepend_memory;
 
-    /// Increases the refcount of the given buffer by one.
-    ///
-    /// Note that the refcount affects the writability
-    /// of `buf` and its metadata, see `gst_buffer_is_writable`.
-    /// It is important to note that keeping additional references to
-    /// GstBuffer instances can potentially increase the number
-    /// of `memcpy` operations in a pipeline.
-    extern fn gst_buffer_ref(p_buf: *Buffer) *gst.Buffer;
-    pub const ref = gst_buffer_ref;
-
     /// Removes all the memory blocks in `buffer`.
     extern fn gst_buffer_remove_all_memory(p_buffer: *Buffer) void;
     pub const removeAllMemory = gst_buffer_remove_all_memory;
@@ -9069,11 +9042,6 @@ pub const Buffer = extern struct {
     extern fn gst_buffer_unmap(p_buffer: *Buffer, p_info: *gst.MapInfo) void;
     pub const unmap = gst_buffer_unmap;
 
-    /// Decreases the refcount of the buffer. If the refcount reaches 0, the buffer
-    /// with the associated metadata and memory will be freed.
-    extern fn gst_buffer_unref(p_buf: *Buffer) void;
-    pub const unref = gst_buffer_unref;
-
     /// Clears one or more buffer flags.
     extern fn gst_buffer_unset_flags(p_buffer: *Buffer, p_flags: gst.BufferFlags) c_int;
     pub const unsetFlags = gst_buffer_unset_flags;
@@ -9096,21 +9064,6 @@ pub const Buffer = extern struct {
 /// interesting when multiple buffers need to be pushed in one go because it
 /// can reduce the amount of overhead for pushing each buffer individually.
 pub const BufferList = opaque {
-    /// Modifies a pointer to a `gst.BufferList` to point to a different
-    /// `gst.BufferList`. The modification is done atomically (so this is useful for
-    /// ensuring thread safety in some cases), and the reference counts are updated
-    /// appropriately (the old buffer list is unreffed, the new is reffed).
-    ///
-    /// Either `new_list` or the `gst.BufferList` pointed to by `old_list` may be `NULL`.
-    extern fn gst_buffer_list_replace(p_old_list: ?**gst.BufferList, p_new_list: ?*gst.BufferList) c_int;
-    pub const replace = gst_buffer_list_replace;
-
-    /// Modifies a pointer to a `gst.BufferList` to point to a different
-    /// `gst.BufferList`. This function is similar to `gst.bufferListReplace` except
-    /// that it takes ownership of `new_list`.
-    extern fn gst_buffer_list_take(p_old_list: **gst.BufferList, p_new_list: ?*gst.BufferList) c_int;
-    pub const take = gst_buffer_list_take;
-
     /// Creates a new, empty `gst.BufferList`.
     extern fn gst_buffer_list_new() *gst.BufferList;
     pub const new = gst_buffer_list_new;
@@ -9124,12 +9077,6 @@ pub const BufferList = opaque {
     /// size of all buffers.
     extern fn gst_buffer_list_calculate_size(p_list: *BufferList) usize;
     pub const calculateSize = gst_buffer_list_calculate_size;
-
-    /// Creates a shallow copy of the given buffer list. This will make a newly
-    /// allocated copy of the source list with copies of buffer pointers. The
-    /// refcount of buffers pointed to will be increased by one.
-    extern fn gst_buffer_list_copy(p_list: *const BufferList) *gst.BufferList;
-    pub const copy = gst_buffer_list_copy;
 
     /// Creates a copy of the given buffer list. This will make a newly allocated
     /// copy of the buffers that the source buffer list contains.
@@ -9169,24 +9116,10 @@ pub const BufferList = opaque {
     extern fn gst_buffer_list_length(p_list: *BufferList) c_uint;
     pub const length = gst_buffer_list_length;
 
-    /// Increases the refcount of the given buffer list by one.
-    ///
-    /// Note that the refcount affects the writability of `list` and its data, see
-    /// `gst_buffer_list_make_writable`. It is important to note that keeping
-    /// additional references to GstBufferList instances can potentially increase
-    /// the number of memcpy operations in a pipeline.
-    extern fn gst_buffer_list_ref(p_list: *BufferList) *gst.BufferList;
-    pub const ref = gst_buffer_list_ref;
-
     /// Removes `length` buffers starting from `idx` in `list`. The following buffers
     /// are moved to close the gap.
     extern fn gst_buffer_list_remove(p_list: *BufferList, p_idx: c_uint, p_length: c_uint) void;
     pub const remove = gst_buffer_list_remove;
-
-    /// Decreases the refcount of the buffer list. If the refcount reaches 0, the
-    /// buffer list will be freed.
-    extern fn gst_buffer_list_unref(p_list: *BufferList) void;
-    pub const unref = gst_buffer_list_unref;
 
     extern fn gst_buffer_list_get_type() usize;
     pub const getGObjectType = gst_buffer_list_get_type;
@@ -9351,21 +9284,6 @@ pub const Caps = extern struct {
     extern fn gst_caps_from_string(p_string: [*:0]const u8) ?*gst.Caps;
     pub const fromString = gst_caps_from_string;
 
-    /// Modifies a pointer to a `gst.Caps` to point to a different `gst.Caps`. The
-    /// modification is done atomically (so this is useful for ensuring thread safety
-    /// in some cases), and the reference counts are updated appropriately (the old
-    /// caps is unreffed, the new is reffed).
-    ///
-    /// Either `new_caps` or the `gst.Caps` pointed to by `old_caps` may be `NULL`.
-    extern fn gst_caps_replace(p_old_caps: ?**gst.Caps, p_new_caps: ?*gst.Caps) c_int;
-    pub const replace = gst_caps_replace;
-
-    /// Modifies a pointer to a `gst.Caps` to point to a different `gst.Caps`. This
-    /// function is similar to `gst.capsReplace` except that it takes ownership
-    /// of `new_caps`.
-    extern fn gst_caps_take(p_old_caps: **gst.Caps, p_new_caps: ?*gst.Caps) c_int;
-    pub const take = gst_caps_take;
-
     /// Creates a new `gst.Caps` that indicates that it is compatible with
     /// any media format.
     extern fn gst_caps_new_any() *gst.Caps;
@@ -9452,9 +9370,9 @@ pub const Caps = extern struct {
     /// Creates a new `gst.Caps` as a copy of the old `caps`. The new caps will have a
     /// refcount of 1, owned by the caller. The structures are copied as well.
     ///
-    /// Note that this function is the semantic equivalent of a `gst.Caps.ref`
+    /// Note that this function is the semantic equivalent of a `gst_caps_ref`
     /// followed by a `gst_caps_make_writable`. If you only want to hold on to a
-    /// reference to the data, you should use `gst.Caps.ref`.
+    /// reference to the data, you should use `gst_caps_ref`.
     extern fn gst_caps_copy(p_caps: *const Caps) *gst.Caps;
     pub const copy = gst_caps_copy;
 
@@ -9477,7 +9395,7 @@ pub const Caps = extern struct {
     ///
     /// This function takes ownership of `caps` and will call `gst_caps_make_writable`
     /// on it so you must not use `caps` afterwards unless you keep an additional
-    /// reference to it with `gst.Caps.ref`.
+    /// reference to it with `gst_caps_ref`.
     ///
     /// Note that it is not guaranteed that the returned caps have exactly one
     /// structure. If `caps` are empty caps then the returned caps will be
@@ -9624,20 +9542,9 @@ pub const Caps = extern struct {
     ///
     /// This function takes ownership of `caps` and will call `gst_caps_make_writable`
     /// on it so you must not use `caps` afterwards unless you keep an additional
-    /// reference to it with `gst.Caps.ref`.
+    /// reference to it with `gst_caps_ref`.
     extern fn gst_caps_normalize(p_caps: *Caps) *gst.Caps;
     pub const normalize = gst_caps_normalize;
-
-    /// Adds a reference to a `gst.Caps` object.
-    ///
-    /// From this point on, until the caller calls `gst.Caps.unref` or
-    /// `gst_caps_make_writable`, it is guaranteed that the caps object will not
-    /// change. This means its structures won't change, etc. To use a `gst.Caps`
-    /// object, you must always have a refcount on it -- either the one made
-    /// implicitly by e.g. `gst.Caps.newSimple`, or via taking one explicitly with
-    /// this function.
-    extern fn gst_caps_ref(p_caps: *Caps) *gst.Caps;
-    pub const ref = gst_caps_ref;
 
     /// Removes the structure with the given index from the list of structures
     /// contained in `caps`.
@@ -9712,7 +9619,7 @@ pub const Caps = extern struct {
     ///
     /// This function takes ownership of `caps` and will call `gst_caps_make_writable`
     /// on it if necessary, so you must not use `caps` afterwards unless you keep an
-    /// additional reference to it with `gst.Caps.ref`.
+    /// additional reference to it with `gst_caps_ref`.
     ///
     /// This method does not preserve the original order of `caps`.
     extern fn gst_caps_simplify(p_caps: *Caps) *gst.Caps;
@@ -9750,18 +9657,13 @@ pub const Caps = extern struct {
     ///
     /// This function takes ownership of `caps` and will call `gst_caps_make_writable`
     /// on it if necessary, so you must not use `caps` afterwards unless you keep an
-    /// additional reference to it with `gst.Caps.ref`.
+    /// additional reference to it with `gst_caps_ref`.
     ///
     /// Note that it is not guaranteed that the returned caps have exactly one
     /// structure. If `caps` is any or empty caps then the returned caps will be
     /// the same and contain no structure at all.
     extern fn gst_caps_truncate(p_caps: *Caps) *gst.Caps;
     pub const truncate = gst_caps_truncate;
-
-    /// Unrefs a `gst.Caps` and frees all its structures and the
-    /// structures' values when the refcount reaches 0.
-    extern fn gst_caps_unref(p_caps: *Caps) void;
-    pub const unref = gst_caps_unref;
 
     extern fn gst_caps_get_type() usize;
     pub const getGObjectType = gst_caps_get_type;
@@ -10077,22 +9979,9 @@ pub const ClockPrivate = opaque {
 /// Also, a non-persistent context won't override a previous persistent
 /// context set to an element.
 pub const Context = opaque {
-    /// Modifies a pointer to a `gst.Context` to point to a different `gst.Context`. The
-    /// modification is done atomically (so this is useful for ensuring thread safety
-    /// in some cases), and the reference counts are updated appropriately (the old
-    /// context is unreffed, the new one is reffed).
-    ///
-    /// Either `new_context` or the `gst.Context` pointed to by `old_context` may be `NULL`.
-    extern fn gst_context_replace(p_old_context: **gst.Context, p_new_context: ?*gst.Context) c_int;
-    pub const replace = gst_context_replace;
-
     /// Creates a new context.
     extern fn gst_context_new(p_context_type: [*:0]const u8, p_persistent: c_int) *gst.Context;
     pub const new = gst_context_new;
-
-    /// Creates a copy of the context. Returns a copy of the context.
-    extern fn gst_context_copy(p_context: *const Context) *gst.Context;
-    pub const copy = gst_context_copy;
 
     /// Gets the type of `context`.
     extern fn gst_context_get_context_type(p_context: *const Context) [*:0]const u8;
@@ -10109,15 +9998,6 @@ pub const Context = opaque {
     /// Checks if `context` is persistent.
     extern fn gst_context_is_persistent(p_context: *const Context) c_int;
     pub const isPersistent = gst_context_is_persistent;
-
-    /// Convenience macro to increase the reference count of the context.
-    extern fn gst_context_ref(p_context: *Context) *gst.Context;
-    pub const ref = gst_context_ref;
-
-    /// Convenience macro to decrease the reference count of the context, possibly
-    /// freeing it.
-    extern fn gst_context_unref(p_context: *Context) void;
-    pub const unref = gst_context_unref;
 
     /// Gets a writable version of the structure.
     extern fn gst_context_writable_structure(p_context: *Context) *gst.Structure;
@@ -10783,7 +10663,7 @@ pub const ElementFactoryClass = opaque {
 /// specific parameters as arguments.
 /// To send an event application will usually use `gst.Element.sendEvent` and
 /// elements will use `gst.Pad.sendEvent` or `gst.Pad.pushEvent`.
-/// The event should be unreffed with `gst.Event.unref` if it has not been sent.
+/// The event should be unreffed with `gst_event_unref` if it has not been sent.
 ///
 /// Events that have been received can be parsed with their respective
 /// gst_event_parse_*() functions. It is valid to pass `NULL` for unwanted details.
@@ -10826,28 +10706,6 @@ pub const Event = extern struct {
     f_timestamp: u64,
     /// the sequence number of the event
     f_seqnum: u32,
-
-    /// Modifies a pointer to a `gst.Event` to point to a different `gst.Event`. The
-    /// modification is done atomically (so this is useful for ensuring thread safety
-    /// in some cases), and the reference counts are updated appropriately (the old
-    /// event is unreffed, the new one is reffed).
-    ///
-    /// Either `new_event` or the `gst.Event` pointed to by `old_event` may be `NULL`.
-    extern fn gst_event_replace(p_old_event: ?**gst.Event, p_new_event: ?*gst.Event) c_int;
-    pub const replace = gst_event_replace;
-
-    /// Atomically replace the `gst.Event` pointed to by `old_event` with `NULL` and
-    /// return the original event.
-    extern fn gst_event_steal(p_old_event: ?**gst.Event) *gst.Event;
-    pub const steal = gst_event_steal;
-
-    /// Modifies a pointer to a `gst.Event` to point to a different `gst.Event`. This
-    /// function is similar to `gst.eventReplace` except that it takes ownership of
-    /// `new_event`.
-    ///
-    /// Either `new_event` or the `gst.Event` pointed to by `old_event` may be `NULL`.
-    extern fn gst_event_take(p_old_event: ?**gst.Event, p_new_event: ?*gst.Event) c_int;
-    pub const take = gst_event_take;
 
     /// Create a new buffersize event. The event is sent downstream and notifies
     /// elements that they should provide a buffer of the specified dimensions.
@@ -11231,10 +11089,6 @@ pub const Event = extern struct {
     extern fn gst_event_new_toc_select(p_uid: [*:0]const u8) *gst.Event;
     pub const newTocSelect = gst_event_new_toc_select;
 
-    /// Copy the event using the event specific copy function.
-    extern fn gst_event_copy(p_event: *const Event) *gst.Event;
-    pub const copy = gst_event_copy;
-
     /// Parses a segment `event` and copies the `gst.Segment` into the location
     /// given by `segment`.
     extern fn gst_event_copy_segment(p_event: *Event, p_segment: *gst.Segment) void;
@@ -11400,10 +11254,6 @@ pub const Event = extern struct {
     extern fn gst_event_parse_toc_select(p_event: *Event, p_uid: ?*[*:0]u8) void;
     pub const parseTocSelect = gst_event_parse_toc_select;
 
-    /// Increase the refcount of this event.
-    extern fn gst_event_ref(p_event: *Event) *gst.Event;
-    pub const ref = gst_event_ref;
-
     /// Sets `flags` on `event` to give additional information about the reason for
     /// the `GST_EVENT_GAP`.
     extern fn gst_event_set_gap_flags(p_event: *Event, p_flags: gst.GapFlags) void;
@@ -11448,10 +11298,6 @@ pub const Event = extern struct {
 
     extern fn gst_event_set_stream_flags(p_event: *Event, p_flags: gst.StreamFlags) void;
     pub const setStreamFlags = gst_event_set_stream_flags;
-
-    /// Decrease the refcount of an event, freeing it if the refcount reaches 0.
-    extern fn gst_event_unref(p_event: *Event) void;
-    pub const unref = gst_event_unref;
 
     /// Get a writable version of the structure.
     extern fn gst_event_writable_structure(p_event: *Event) *gst.Structure;
@@ -11858,8 +11704,8 @@ pub const MapInfo = extern struct {
 /// New memory can be created with `gst.Memory.newWrapped` that wraps the memory
 /// allocated elsewhere.
 ///
-/// Refcounting of the memory block is performed with `gst.Memory.ref` and
-/// `gst.Memory.unref`.
+/// Refcounting of the memory block is performed with `gst_memory_ref` and
+/// `gst_memory_unref`.
 ///
 /// The size of the memory can be retrieved and changed with
 /// `gst.Memory.getSizes` and `gst.Memory.resize` respectively.
@@ -11949,10 +11795,6 @@ pub const Memory = extern struct {
     extern fn gst_memory_map(p_mem: *Memory, p_info: *gst.MapInfo, p_flags: gst.MapFlags) c_int;
     pub const map = gst_memory_map;
 
-    /// Increase the refcount of this memory.
-    extern fn gst_memory_ref(p_memory: *Memory) *gst.Memory;
-    pub const ref = gst_memory_ref;
-
     /// Resize the memory region. `mem` should be writable and offset + size should be
     /// less than the maxsize of `mem`.
     ///
@@ -11971,10 +11813,6 @@ pub const Memory = extern struct {
     /// Release the memory obtained with `gst.Memory.map`
     extern fn gst_memory_unmap(p_mem: *Memory, p_info: *gst.MapInfo) void;
     pub const unmap = gst_memory_unmap;
-
-    /// Decrease the refcount of a memory, freeing it if the refcount reaches 0.
-    extern fn gst_memory_unref(p_memory: *Memory) void;
-    pub const unref = gst_memory_unref;
 
     extern fn gst_memory_get_type() usize;
     pub const getGObjectType = gst_memory_get_type;
@@ -12022,12 +11860,6 @@ pub const Message = extern struct {
     /// Either `new_message` or the `gst.Message` pointed to by `old_message` may be `NULL`.
     extern fn gst_message_replace(p_old_message: ?**gst.Message, p_new_message: ?*gst.Message) c_int;
     pub const replace = gst_message_replace;
-
-    /// Modifies a pointer to a `gst.Message` to point to a different `gst.Message`. This
-    /// function is similar to `gst.messageReplace` except that it takes ownership
-    /// of `new_message`.
-    extern fn gst_message_take(p_old_message: **gst.Message, p_new_message: ?*gst.Message) c_int;
-    pub const take = gst_message_take;
 
     /// Create a new application-typed message. GStreamer will never create these
     /// messages; they are a gift from us to you. Enjoy.
@@ -12696,10 +12528,6 @@ pub const Message = extern struct {
     extern fn gst_message_parse_warning_writable_details(p_message: *Message, p_structure: ?**gst.Structure) void;
     pub const parseWarningWritableDetails = gst_message_parse_warning_writable_details;
 
-    /// Convenience macro to increase the reference count of the message.
-    extern fn gst_message_ref(p_msg: *Message) *gst.Message;
-    pub const ref = gst_message_ref;
-
     /// Configures the buffering stats values in `message`.
     extern fn gst_message_set_buffering_stats(p_message: *Message, p_mode: gst.BufferingMode, p_avg_in: c_int, p_avg_out: c_int, p_buffering_left: i64) void;
     pub const setBufferingStats = gst_message_set_buffering_stats;
@@ -12763,11 +12591,6 @@ pub const Message = extern struct {
     /// Retrieves the `gst.Stream` with index `index` from the `message`.
     extern fn gst_message_streams_selected_get_stream(p_message: *Message, p_idx: c_uint) ?*gst.Stream;
     pub const streamsSelectedGetStream = gst_message_streams_selected_get_stream;
-
-    /// Convenience macro to decrease the reference count of the message, possibly
-    /// freeing it.
-    extern fn gst_message_unref(p_msg: *Message) void;
-    pub const unref = gst_message_unref;
 
     /// Returns the details structure of the `message`. If not present it will be
     /// created. Use this function (instead of `gst.Message.getDetails`) if you
@@ -13795,10 +13618,6 @@ pub const Promise = extern struct {
     extern fn gst_promise_interrupt(p_promise: *Promise) void;
     pub const interrupt = gst_promise_interrupt;
 
-    /// Increases the refcount of the given `promise` by one.
-    extern fn gst_promise_ref(p_promise: *Promise) *gst.Promise;
-    pub const ref = gst_promise_ref;
-
     /// Set a reply on `promise`.  This will wake up any waiters with
     /// `GST_PROMISE_RESULT_REPLIED`.  Called by the producer of the value to
     /// indicate success (or failure).
@@ -13807,11 +13626,6 @@ pub const Promise = extern struct {
     /// is not visible to the consumer.
     extern fn gst_promise_reply(p_promise: ?*Promise, p_s: ?*gst.Structure) void;
     pub const reply = gst_promise_reply;
-
-    /// Decreases the refcount of the promise. If the refcount reaches 0, the
-    /// promise will be freed.
-    extern fn gst_promise_unref(p_promise: *Promise) void;
-    pub const unref = gst_promise_unref;
 
     /// Wait for `promise` to move out of the `GST_PROMISE_RESULT_PENDING` state.
     /// If `promise` is not in `GST_PROMISE_RESULT_PENDING` then it will return
@@ -13897,45 +13711,28 @@ pub const Query = extern struct {
     /// the `gst.QueryType`
     f_type: gst.QueryType,
 
-    /// Modifies a pointer to a `gst.Query` to point to a different `gst.Query`. The
-    /// modification is done atomically (so this is useful for ensuring thread safety
-    /// in some cases), and the reference counts are updated appropriately (the old
-    /// query is unreffed, the new one is reffed).
-    ///
-    /// Either `new_query` or the `gst.Query` pointed to by `old_query` may be `NULL`.
-    extern fn gst_query_replace(p_old_query: ?**gst.Query, p_new_query: ?*gst.Query) c_int;
-    pub const replace = gst_query_replace;
-
-    /// Modifies a pointer to a `gst.Query` to point to a different `gst.Query`. This
-    /// function is similar to `gst.queryReplace` except that it takes ownership of
-    /// `new_query`.
-    ///
-    /// Either `new_query` or the `gst.Query` pointed to by `old_query` may be `NULL`.
-    extern fn gst_query_take(p_old_query: ?**gst.Query, p_new_query: ?*gst.Query) c_int;
-    pub const take = gst_query_take;
-
     /// Constructs a new query object for querying if `caps` are accepted.
     ///
-    /// Free-function: `gst.Query.unref`
+    /// Free-function: `gst_query_unref`
     extern fn gst_query_new_accept_caps(p_caps: *gst.Caps) *gst.Query;
     pub const newAcceptCaps = gst_query_new_accept_caps;
 
     /// Constructs a new query object for querying the allocation properties.
     ///
-    /// Free-function: `gst.Query.unref`
+    /// Free-function: `gst_query_unref`
     extern fn gst_query_new_allocation(p_caps: ?*gst.Caps, p_need_pool: c_int) *gst.Query;
     pub const newAllocation = gst_query_new_allocation;
 
     /// Constructs a new query object for querying the bitrate.
     ///
-    /// Free-function: `gst.Query.unref`
+    /// Free-function: `gst_query_unref`
     extern fn gst_query_new_bitrate() *gst.Query;
     pub const newBitrate = gst_query_new_bitrate;
 
     /// Constructs a new query object for querying the buffering status of
     /// a stream.
     ///
-    /// Free-function: `gst.Query.unref`
+    /// Free-function: `gst_query_unref`
     extern fn gst_query_new_buffering(p_format: gst.Format) *gst.Query;
     pub const newBuffering = gst_query_new_buffering;
 
@@ -13958,101 +13755,101 @@ pub const Query = extern struct {
     /// `filter` should be returned from the CAPS query. Specifying a filter might
     /// greatly reduce the amount of processing an element needs to do.
     ///
-    /// Free-function: `gst.Query.unref`
+    /// Free-function: `gst_query_unref`
     extern fn gst_query_new_caps(p_filter: *gst.Caps) *gst.Query;
     pub const newCaps = gst_query_new_caps;
 
     /// Constructs a new query object for querying the pipeline-local context.
     ///
-    /// Free-function: `gst.Query.unref`
+    /// Free-function: `gst_query_unref`
     extern fn gst_query_new_context(p_context_type: [*:0]const u8) *gst.Query;
     pub const newContext = gst_query_new_context;
 
-    /// Constructs a new convert query object. Use `gst.Query.unref`
+    /// Constructs a new convert query object. Use `gst_query_unref`
     /// when done with it. A convert query is used to ask for a conversion between
     /// one format and another.
     ///
-    /// Free-function: `gst.Query.unref`
+    /// Free-function: `gst_query_unref`
     extern fn gst_query_new_convert(p_src_format: gst.Format, p_value: i64, p_dest_format: gst.Format) *gst.Query;
     pub const newConvert = gst_query_new_convert;
 
-    /// Constructs a new custom query object. Use `gst.Query.unref`
+    /// Constructs a new custom query object. Use `gst_query_unref`
     /// when done with it.
     ///
-    /// Free-function: `gst.Query.unref`
+    /// Free-function: `gst_query_unref`
     extern fn gst_query_new_custom(p_type: gst.QueryType, p_structure: ?*gst.Structure) *gst.Query;
     pub const newCustom = gst_query_new_custom;
 
     /// Constructs a new query object for querying the drain state.
     ///
-    /// Free-function: `gst.Query.unref`
+    /// Free-function: `gst_query_unref`
     extern fn gst_query_new_drain() *gst.Query;
     pub const newDrain = gst_query_new_drain;
 
     /// Constructs a new stream duration query object to query in the given format.
-    /// Use `gst.Query.unref` when done with it. A duration query will give the
+    /// Use `gst_query_unref` when done with it. A duration query will give the
     /// total length of the stream.
     ///
-    /// Free-function: `gst.Query.unref`
+    /// Free-function: `gst_query_unref`
     extern fn gst_query_new_duration(p_format: gst.Format) *gst.Query;
     pub const newDuration = gst_query_new_duration;
 
     /// Constructs a new query object for querying formats of
     /// the stream.
     ///
-    /// Free-function: `gst.Query.unref`
+    /// Free-function: `gst_query_unref`
     extern fn gst_query_new_formats() *gst.Query;
     pub const newFormats = gst_query_new_formats;
 
     /// Constructs a new latency query object.
-    /// Use `gst.Query.unref` when done with it. A latency query is usually performed
+    /// Use `gst_query_unref` when done with it. A latency query is usually performed
     /// by sinks to compensate for additional latency introduced by elements in the
     /// pipeline.
     ///
-    /// Free-function: `gst.Query.unref`
+    /// Free-function: `gst_query_unref`
     extern fn gst_query_new_latency() *gst.Query;
     pub const newLatency = gst_query_new_latency;
 
-    /// Constructs a new query stream position query object. Use `gst.Query.unref`
+    /// Constructs a new query stream position query object. Use `gst_query_unref`
     /// when done with it. A position query is used to query the current position
     /// of playback in the streams, in some format.
     ///
-    /// Free-function: `gst.Query.unref`
+    /// Free-function: `gst_query_unref`
     extern fn gst_query_new_position(p_format: gst.Format) *gst.Query;
     pub const newPosition = gst_query_new_position;
 
     /// Constructs a new query object for querying the scheduling properties.
     ///
-    /// Free-function: `gst.Query.unref`
+    /// Free-function: `gst_query_unref`
     extern fn gst_query_new_scheduling() *gst.Query;
     pub const newScheduling = gst_query_new_scheduling;
 
     /// Constructs a new query object for querying seeking properties of
     /// the stream.
     ///
-    /// Free-function: `gst.Query.unref`
+    /// Free-function: `gst_query_unref`
     extern fn gst_query_new_seeking(p_format: gst.Format) *gst.Query;
     pub const newSeeking = gst_query_new_seeking;
 
-    /// Constructs a new segment query object. Use `gst.Query.unref`
+    /// Constructs a new segment query object. Use `gst_query_unref`
     /// when done with it. A segment query is used to discover information about the
     /// currently configured segment for playback.
     ///
-    /// Free-function: `gst.Query.unref`
+    /// Free-function: `gst_query_unref`
     extern fn gst_query_new_segment(p_format: gst.Format) *gst.Query;
     pub const newSegment = gst_query_new_segment;
 
     /// Constructs a new query object for querying the stream selection capability.
     ///
-    /// Free-function: `gst.Query.unref`
+    /// Free-function: `gst_query_unref`
     extern fn gst_query_new_selectable() *gst.Query;
     pub const newSelectable = gst_query_new_selectable;
 
-    /// Constructs a new query URI query object. Use `gst.Query.unref`
+    /// Constructs a new query URI query object. Use `gst_query_unref`
     /// when done with it. An URI query is used to query the current URI
     /// that is used by the source or sink.
     ///
-    /// Free-function: `gst.Query.unref`
+    /// Free-function: `gst_query_unref`
     extern fn gst_query_new_uri() *gst.Query;
     pub const newUri = gst_query_new_uri;
 
@@ -14076,12 +13873,6 @@ pub const Query = extern struct {
     /// Add `mode` as one of the supported scheduling modes to `query`.
     extern fn gst_query_add_scheduling_mode(p_query: *Query, p_mode: gst.PadMode) void;
     pub const addSchedulingMode = gst_query_add_scheduling_mode;
-
-    /// Copies the given query using the copy function of the parent `gst.Structure`.
-    ///
-    /// Free-function: gst_query_unref
-    extern fn gst_query_copy(p_q: *const Query) *gst.Query;
-    pub const copy = gst_query_copy;
 
     /// Check if `query` has metadata `api` set. When this function returns `TRUE`,
     /// `index` will contain the index where the requested API and the parameters
@@ -14289,10 +14080,6 @@ pub const Query = extern struct {
     extern fn gst_query_parse_uri_redirection_permanent(p_query: *Query, p_permanent: ?*c_int) void;
     pub const parseUriRedirectionPermanent = gst_query_parse_uri_redirection_permanent;
 
-    /// Increases the refcount of the given query by one.
-    extern fn gst_query_ref(p_q: *Query) *gst.Query;
-    pub const ref = gst_query_ref;
-
     /// Remove the metadata API at `index` of the metadata API array.
     extern fn gst_query_remove_nth_allocation_meta(p_query: *Query, p_index: c_uint) void;
     pub const removeNthAllocationMeta = gst_query_remove_nth_allocation_meta;
@@ -14411,11 +14198,6 @@ pub const Query = extern struct {
     extern fn gst_query_set_uri_redirection_permanent(p_query: *Query, p_permanent: c_int) void;
     pub const setUriRedirectionPermanent = gst_query_set_uri_redirection_permanent;
 
-    /// Decreases the refcount of the query. If the refcount reaches 0, the query
-    /// will be freed.
-    extern fn gst_query_unref(p_q: *Query) void;
-    pub const unref = gst_query_unref;
-
     /// Get the structure of a query. This method should be called with a writable
     /// `query` so that the returned structure is guaranteed to be writable.
     extern fn gst_query_writable_structure(p_query: *Query) *gst.Structure;
@@ -14502,11 +14284,6 @@ pub const Sample = opaque {
     extern fn gst_sample_new(p_buffer: ?*gst.Buffer, p_caps: ?*gst.Caps, p_segment: ?*const gst.Segment, p_info: ?*gst.Structure) *gst.Sample;
     pub const new = gst_sample_new;
 
-    /// Create a copy of the given sample. This will also make a newly allocated
-    /// copy of the data the source sample contains.
-    extern fn gst_sample_copy(p_sample: *const Sample) *gst.Sample;
-    pub const copy = gst_sample_copy;
-
     /// Get the buffer associated with `sample`
     extern fn gst_sample_get_buffer(p_sample: *Sample) ?*gst.Buffer;
     pub const getBuffer = gst_sample_get_buffer;
@@ -14526,10 +14303,6 @@ pub const Sample = opaque {
     /// Get the segment associated with `sample`
     extern fn gst_sample_get_segment(p_sample: *Sample) *gst.Segment;
     pub const getSegment = gst_sample_get_segment;
-
-    /// Increases the refcount of the given sample by one.
-    extern fn gst_sample_ref(p_sample: *Sample) *gst.Sample;
-    pub const ref = gst_sample_ref;
 
     /// Set the buffer associated with `sample`. `sample` must be writable.
     extern fn gst_sample_set_buffer(p_sample: *Sample, p_buffer: *gst.Buffer) void;
@@ -14551,11 +14324,6 @@ pub const Sample = opaque {
     /// Set the segment associated with `sample`. `sample` must be writable.
     extern fn gst_sample_set_segment(p_sample: *Sample, p_segment: *const gst.Segment) void;
     pub const setSegment = gst_sample_set_segment;
-
-    /// Decreases the refcount of the sample. If the refcount reaches 0, the
-    /// sample will be freed.
-    extern fn gst_sample_unref(p_sample: *Sample) void;
-    pub const unref = gst_sample_unref;
 
     extern fn gst_sample_get_type() usize;
     pub const getGObjectType = gst_sample_get_type;
@@ -15895,22 +15663,6 @@ pub const TagList = extern struct {
     extern fn gst_tag_list_copy_value(p_dest: *gobject.Value, p_list: *const gst.TagList, p_tag: [*:0]const u8) c_int;
     pub const copyValue = gst_tag_list_copy_value;
 
-    /// Modifies a pointer to a `gst.TagList` to point to a different `gst.TagList`. The
-    /// modification is done atomically (so this is useful for ensuring thread
-    /// safety in some cases), and the reference counts are updated appropriately
-    /// (the old tag list is unreffed, the new is reffed).
-    ///
-    /// Either `new_taglist` or the `gst.TagList` pointed to by `old_taglist` may be
-    /// `NULL`.
-    extern fn gst_tag_list_replace(p_old_taglist: ?**gst.TagList, p_new_taglist: ?*gst.TagList) c_int;
-    pub const replace = gst_tag_list_replace;
-
-    /// Modifies a pointer to a `gst.TagList` to point to a different `gst.TagList`.
-    /// This function is similar to `gst.tagListReplace` except that it takes
-    /// ownership of `new_taglist`.
-    extern fn gst_tag_list_take(p_old_taglist: **gst.TagList, p_new_taglist: ?*gst.TagList) c_int;
-    pub const take = gst_tag_list_take;
-
     /// Creates a new taglist and appends the values for the given tags. It expects
     /// tag-value pairs like `gst.TagList.add`, and a `NULL` terminator after the
     /// last pair. The type of the values is implicit and is documented in the API
@@ -15968,11 +15720,11 @@ pub const TagList = extern struct {
     /// will have a refcount of 1, owned by the caller, and will be writable as
     /// a result.
     ///
-    /// Note that this function is the semantic equivalent of a `gst.TagList.ref`
+    /// Note that this function is the semantic equivalent of a `gst_tag_list_ref`
     /// followed by a `gst_tag_list_make_writable`. If you only want to hold on to a
-    /// reference to the data, you should use `gst.TagList.ref`.
+    /// reference to the data, you should use `gst_tag_list_ref`.
     ///
-    /// When you are finished with the taglist, call `gst.TagList.unref` on it.
+    /// When you are finished with the taglist, call `gst_tag_list_unref` on it.
     extern fn gst_tag_list_copy(p_taglist: *const TagList) *gst.TagList;
     pub const copy = gst_tag_list_copy;
 
@@ -16074,7 +15826,7 @@ pub const TagList = extern struct {
     pub const getPointerIndex = gst_tag_list_get_pointer_index;
 
     /// Copies the first sample for the given tag in the taglist into the variable
-    /// pointed to by `sample`. Free the sample with `gst.Sample.unref` when it is
+    /// pointed to by `sample`. Free the sample with `gst_sample_unref` when it is
     /// no longer needed. You can retrieve the buffer from the sample using
     /// `gst.Sample.getBuffer` and the associated caps (if any) with
     /// `gst.Sample.getCaps`.
@@ -16085,7 +15837,7 @@ pub const TagList = extern struct {
 
     /// Gets the sample that is at the given index for the given tag in the given
     /// list and copies it into the variable pointed to by `sample`. Free the sample
-    /// with `gst.Sample.unref` when it is no longer needed. You can retrieve the
+    /// with `gst_sample_unref` when it is no longer needed. You can retrieve the
     /// buffer from the sample using `gst.Sample.getBuffer` and the associated
     /// caps (if any) with `gst.Sample.getCaps`.
     ///
@@ -16187,16 +15939,6 @@ pub const TagList = extern struct {
     extern fn gst_tag_list_peek_string_index(p_list: *const TagList, p_tag: [*:0]const u8, p_index: c_uint, p_value: *[*:0]const u8) c_int;
     pub const peekStringIndex = gst_tag_list_peek_string_index;
 
-    /// Add a reference to a `gst.TagList` mini object.
-    ///
-    /// From this point on, until the caller calls `gst.TagList.unref` or
-    /// `gst_tag_list_make_writable`, it is guaranteed that the taglist object will
-    /// not change. To use a `gst.TagList` object, you must always have a refcount on
-    /// it -- either the one made implicitly by e.g. `gst.TagList.new`, or via
-    /// taking one explicitly with this function.
-    extern fn gst_tag_list_ref(p_taglist: *TagList) *gst.TagList;
-    pub const ref = gst_tag_list_ref;
-
     /// Removes the given tag from the taglist.
     extern fn gst_tag_list_remove_tag(p_list: *TagList, p_tag: [*:0]const u8) void;
     pub const removeTag = gst_tag_list_remove_tag;
@@ -16209,10 +15951,6 @@ pub const TagList = extern struct {
     /// Serializes a tag list to a string.
     extern fn gst_tag_list_to_string(p_list: *const TagList) [*:0]u8;
     pub const toString = gst_tag_list_to_string;
-
-    /// Unref a `gst.TagList`, and and free all its memory when the refcount reaches 0.
-    extern fn gst_tag_list_unref(p_taglist: *TagList) void;
-    pub const unref = gst_tag_list_unref;
 
     extern fn gst_tag_list_get_type() usize;
     pub const getGObjectType = gst_tag_list_get_type;
@@ -16744,11 +16482,6 @@ pub const Uri = opaque {
     extern fn gst_uri_append_path_segment(p_uri: ?*Uri, p_path_segment: ?[*:0]const u8) c_int;
     pub const appendPathSegment = gst_uri_append_path_segment;
 
-    /// Create a new `gst.Uri` object with the same data as this `gst.Uri` object.
-    /// If `uri` is `NULL` then returns `NULL`.
-    extern fn gst_uri_copy(p_uri: *const Uri) *gst.Uri;
-    pub const copy = gst_uri_copy;
-
     /// Compares two `gst.Uri` objects to see if they represent the same normalized
     /// URI.
     extern fn gst_uri_equal(p_first: *const Uri, p_second: *const gst.Uri) c_int;
@@ -16889,11 +16622,6 @@ pub const Uri = opaque {
     extern fn gst_uri_query_has_key(p_uri: ?*const Uri, p_query_key: [*:0]const u8) c_int;
     pub const queryHasKey = gst_uri_query_has_key;
 
-    /// Add a reference to this `gst.Uri` object. See `gst.MiniObject.ref` for further
-    /// info.
-    extern fn gst_uri_ref(p_uri: *Uri) *gst.Uri;
-    pub const ref = gst_uri_ref;
-
     /// Remove an entry from the query table by key.
     extern fn gst_uri_remove_query_key(p_uri: ?*Uri, p_query_key: [*:0]const u8) c_int;
     pub const removeQueryKey = gst_uri_remove_query_key;
@@ -16963,14 +16691,6 @@ pub const Uri = opaque {
     /// The string is put together as described in RFC 3986.
     extern fn gst_uri_to_string_with_keys(p_uri: ?*const Uri, p_keys: ?*const glib.List) [*:0]u8;
     pub const toStringWithKeys = gst_uri_to_string_with_keys;
-
-    /// Decrement the reference count to this `gst.Uri` object.
-    ///
-    /// If the reference count drops to 0 then finalize this object.
-    ///
-    /// See `gst.MiniObject.unref` for further info.
-    extern fn gst_uri_unref(p_uri: *Uri) void;
-    pub const unref = gst_uri_unref;
 
     extern fn gst_uri_get_type() usize;
     pub const getGObjectType = gst_uri_get_type;
@@ -20253,60 +19973,6 @@ pub const TracerValueFlags = packed struct(c_uint) {
 extern fn gst_calculate_linear_regression(p_xy: *const gst.ClockTime, p_temp: *gst.ClockTime, p_n: c_uint, p_m_num: *gst.ClockTime, p_m_denom: *gst.ClockTime, p_b: *gst.ClockTime, p_xbase: *gst.ClockTime, p_r_squared: *f64) c_int;
 pub const calculateLinearRegression = gst_calculate_linear_regression;
 
-/// Clears a reference to a `gst.Buffer`.
-///
-/// `buf_ptr` must not be `NULL`.
-///
-/// If the reference is `NULL` then this function does nothing. Otherwise, the
-/// reference count of the buffer is decreased and the pointer is set to `NULL`.
-extern fn gst_clear_buffer(p_buf_ptr: **gst.Buffer) void;
-pub const clearBuffer = gst_clear_buffer;
-
-/// Clears a reference to a `gst.BufferList`.
-///
-/// `list_ptr` must not be `NULL`.
-///
-/// If the reference is `NULL` then this function does nothing. Otherwise, the
-/// reference count of the list is decreased and the pointer is set to `NULL`.
-extern fn gst_clear_buffer_list(p_list_ptr: **gst.BufferList) void;
-pub const clearBufferList = gst_clear_buffer_list;
-
-/// Clears a reference to a `gst.Caps`.
-///
-/// `caps_ptr` must not be `NULL`.
-///
-/// If the reference is `NULL` then this function does nothing. Otherwise, the
-/// reference count of the caps is decreased and the pointer is set to `NULL`.
-extern fn gst_clear_caps(p_caps_ptr: **gst.Caps) void;
-pub const clearCaps = gst_clear_caps;
-
-/// Clears a reference to a `gst.Context`.
-///
-/// `context_ptr` must not be `NULL`.
-///
-/// If the reference is `NULL` then this function does nothing. Otherwise, the
-/// reference count of the context is decreased and the pointer is set to `NULL`.
-extern fn gst_clear_context(p_context_ptr: **gst.Context) void;
-pub const clearContext = gst_clear_context;
-
-/// Clears a reference to a `gst.Event`.
-///
-/// `event_ptr` must not be `NULL`.
-///
-/// If the reference is `NULL` then this function does nothing. Otherwise, the
-/// reference count of the event is decreased and the pointer is set to `NULL`.
-extern fn gst_clear_event(p_event_ptr: **gst.Event) void;
-pub const clearEvent = gst_clear_event;
-
-/// Clears a reference to a `gst.Message`.
-///
-/// `msg_ptr` must not be `NULL`.
-///
-/// If the reference is `NULL` then this function does nothing. Otherwise, the
-/// reference count of the message is decreased and the pointer is set to `NULL`.
-extern fn gst_clear_message(p_msg_ptr: **gst.Message) void;
-pub const clearMessage = gst_clear_message;
-
 /// Clears a reference to a `gst.MiniObject`.
 ///
 /// `object_ptr` must not be `NULL`.
@@ -20333,33 +19999,6 @@ pub const clearMiniObject = gst_clear_mini_object;
 extern fn gst_clear_object(p_object_ptr: **gst.Object) void;
 pub const clearObject = gst_clear_object;
 
-/// Clears a reference to a `gst.Promise`.
-///
-/// `promise_ptr` must not be `NULL`.
-///
-/// If the reference is `NULL` then this function does nothing. Otherwise, the
-/// reference count of the promise is decreased and the pointer is set to `NULL`.
-extern fn gst_clear_promise(p_promise_ptr: **gst.Promise) void;
-pub const clearPromise = gst_clear_promise;
-
-/// Clears a reference to a `gst.Query`.
-///
-/// `query_ptr` must not be `NULL`.
-///
-/// If the reference is `NULL` then this function does nothing. Otherwise, the
-/// reference count of the query is decreased and the pointer is set to `NULL`.
-extern fn gst_clear_query(p_query_ptr: **gst.Query) void;
-pub const clearQuery = gst_clear_query;
-
-/// Clears a reference to a `gst.Sample`
-///
-/// `sample_ptr` must not be `NULL`.
-///
-/// If the reference is `NULL` then this function does nothing. Otherwise, the
-/// reference count of the sample is decreased and the pointer is set to `NULL`.
-extern fn gst_clear_sample(p_sample_ptr: **gst.Sample) void;
-pub const clearSample = gst_clear_sample;
-
 /// Clears a reference to a `gst.Structure`.
 ///
 /// `structure_ptr` must not be `NULL`.
@@ -20372,24 +20011,6 @@ pub const clearSample = gst_clear_sample;
 /// pointer casts.
 extern fn gst_clear_structure(p_structure_ptr: **gst.Structure) void;
 pub const clearStructure = gst_clear_structure;
-
-/// Clears a reference to a `gst.TagList`.
-///
-/// `taglist_ptr` must not be `NULL`.
-///
-/// If the reference is `NULL` then this function does nothing. Otherwise, the
-/// reference count of the taglist is decreased and the pointer is set to `NULL`.
-extern fn gst_clear_tag_list(p_taglist_ptr: **gst.TagList) void;
-pub const clearTagList = gst_clear_tag_list;
-
-/// Clears a reference to a `gst.Uri`.
-///
-/// `uri_ptr` must not be `NULL`.
-///
-/// If the reference is `NULL` then this function does nothing. Otherwise, the
-/// reference count of the uri is decreased and the pointer is set to `NULL`.
-extern fn gst_clear_uri(p_uri_ptr: **gst.Uri) void;
-pub const clearUri = gst_clear_uri;
 
 /// Adds the logging function to the list of logging functions.
 /// Be sure to use `G_GNUC_NO_INSTRUMENT` on that function, it is needed.
@@ -21521,10 +21142,10 @@ pub const ClockCallback = *const fn (p_clock: *gst.Clock, p_time: gst.ClockTime,
 pub const ControlBindingConvert = *const fn (p_binding: *gst.ControlBinding, p_src_value: f64, p_dest_value: *gobject.Value) callconv(.c) void;
 
 /// Function for returning a value for a given timestamp.
-pub const ControlSourceGetValue = *const fn (p_self: *anyopaque, p_timestamp: gst.ClockTime, p_value: *f64) callconv(.c) c_int;
+pub const ControlSourceGetValue = *const fn (p_self: *gst.ControlSource, p_timestamp: gst.ClockTime, p_value: *f64) callconv(.c) c_int;
 
 /// Function for returning an array of values starting at a given timestamp.
-pub const ControlSourceGetValueArray = *const fn (p_self: *anyopaque, p_timestamp: gst.ClockTime, p_interval: gst.ClockTime, p_n_values: c_uint, p_values: *f64) callconv(.c) c_int;
+pub const ControlSourceGetValueArray = *const fn (p_self: *gst.ControlSource, p_timestamp: gst.ClockTime, p_interval: gst.ClockTime, p_n_values: c_uint, p_values: *f64) callconv(.c) c_int;
 
 /// Function called for each `meta` in `buffer` as a result of performing a
 /// transformation that yields `transbuf`. Additional `type` specific transform
@@ -21598,32 +21219,32 @@ pub const LogFunction = *const fn (p_category: *gst.DebugCategory, p_level: gst.
 /// Copy `size` bytes from `mem` starting at `offset` and return them wrapped in a
 /// new GstMemory object.
 /// If `size` is set to -1, all bytes starting at `offset` are copied.
-pub const MemoryCopyFunction = *const fn (p_mem: *anyopaque, p_offset: isize, p_size: isize) callconv(.c) *anyopaque;
+pub const MemoryCopyFunction = *const fn (p_mem: *gst.Memory, p_offset: isize, p_size: isize) callconv(.c) *gst.Memory;
 
 /// Check if `mem1` and `mem2` occupy contiguous memory and return the offset of
 /// `mem1` in the parent buffer in `offset`.
-pub const MemoryIsSpanFunction = *const fn (p_mem1: *anyopaque, p_mem2: *anyopaque, p_offset: *usize) callconv(.c) c_int;
+pub const MemoryIsSpanFunction = *const fn (p_mem1: *gst.Memory, p_mem2: *gst.Memory, p_offset: *usize) callconv(.c) c_int;
 
 /// Get the memory of `mem` that can be accessed according to the mode specified
 /// in `info`'s flags. The function should return a pointer that contains at least
 /// `maxsize` bytes.
-pub const MemoryMapFullFunction = *const fn (p_mem: *anyopaque, p_info: *anyopaque, p_maxsize: usize) callconv(.c) ?*anyopaque;
+pub const MemoryMapFullFunction = *const fn (p_mem: *gst.Memory, p_info: *gst.MapInfo, p_maxsize: usize) callconv(.c) ?*anyopaque;
 
 /// Get the memory of `mem` that can be accessed according to the mode specified
 /// in `flags`. The function should return a pointer that contains at least
 /// `maxsize` bytes.
-pub const MemoryMapFunction = *const fn (p_mem: *anyopaque, p_maxsize: usize, p_flags: gst.MapFlags) callconv(.c) ?*anyopaque;
+pub const MemoryMapFunction = *const fn (p_mem: *gst.Memory, p_maxsize: usize, p_flags: gst.MapFlags) callconv(.c) ?*anyopaque;
 
 /// Share `size` bytes from `mem` starting at `offset` and return them wrapped in a
 /// new GstMemory object. If `size` is set to -1, all bytes starting at `offset` are
 /// shared. This function does not make a copy of the bytes in `mem`.
-pub const MemoryShareFunction = *const fn (p_mem: *anyopaque, p_offset: isize, p_size: isize) callconv(.c) *anyopaque;
+pub const MemoryShareFunction = *const fn (p_mem: *gst.Memory, p_offset: isize, p_size: isize) callconv(.c) *gst.Memory;
 
 /// Release the pointer previously retrieved with `gst.Memory.map` with `info`.
-pub const MemoryUnmapFullFunction = *const fn (p_mem: *anyopaque, p_info: *anyopaque) callconv(.c) void;
+pub const MemoryUnmapFullFunction = *const fn (p_mem: *gst.Memory, p_info: *gst.MapInfo) callconv(.c) void;
 
 /// Release the pointer previously retrieved with `gst.Memory.map`.
-pub const MemoryUnmapFunction = *const fn (p_mem: *anyopaque) callconv(.c) void;
+pub const MemoryUnmapFunction = *const fn (p_mem: *gst.Memory) callconv(.c) void;
 
 /// Clears the content of the meta. This will be called by the GstBufferPool
 /// when a pooled buffer is returned.
@@ -21689,7 +21310,7 @@ pub const PadActivateModeFunction = *const fn (p_pad: *gst.Pad, p_parent: *gst.O
 /// either consumes the data or passes it on to the internally linked pad(s).
 ///
 /// The implementer of this function receives a refcount to `buffer` and should
-/// `gst.Buffer.unref` when the buffer is no longer needed.
+/// `gst_buffer_unref` when the buffer is no longer needed.
 ///
 /// When a chain function detects an error in the data stream, it must post an
 /// error on the bus and return an appropriate `gst.FlowReturn` value.
@@ -21700,7 +21321,7 @@ pub const PadChainFunction = *const fn (p_pad: *gst.Pad, p_parent: ?*gst.Object,
 /// either consumes the data or passes it on to the internally linked pad(s).
 ///
 /// The implementer of this function receives a refcount to `list` and
-/// should `gst.BufferList.unref` when the list is no longer needed.
+/// should `gst_buffer_list_unref` when the list is no longer needed.
 ///
 /// When a chainlist function detects an error in the data stream, it must
 /// post an error on the bus and return an appropriate `gst.FlowReturn` value.
@@ -22401,7 +22022,7 @@ pub const VALUE_UNORDERED = 2;
 /// The major version of GStreamer at compile time:
 pub const VERSION_MAJOR = 1;
 /// The micro version of GStreamer at compile time:
-pub const VERSION_MICRO = 6;
+pub const VERSION_MICRO = 5;
 /// The minor version of GStreamer at compile time:
 pub const VERSION_MINOR = 26;
 /// The nano version of GStreamer at compile time:

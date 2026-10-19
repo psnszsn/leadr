@@ -17,7 +17,7 @@ pub const Library = struct {
     pub fn linkTo(lib: Library, module: *std.Build.Module) void {
         module.link_libc = true;
         for (lib.system_libraries) |system_lib| {
-            module.linkSystemLibrary(system_lib, .{ .use_pkg_config = .force });
+            module.linkSystemLibrary(system_lib, .{ .use_pkg_config = .yes }); // https://github.com/ianprime0509/zig-gobject/issues/163
         }
     }
 };
@@ -66,7 +66,7 @@ pub fn buildCompileResources(gobject_dependency: *std.Build.Dependency) CompileR
 /// A builder for a compiled GResource bundle.
 pub const CompileResources = struct {
     b: *std.Build,
-    groups: std.ArrayListUnmanaged(*Group) = .{},
+    groups: std.ArrayListUnmanaged(*Group) = .empty,
 
     var build_gresources_xml_exe: ?*std.Build.Step.Compile = null;
 
@@ -116,7 +116,7 @@ pub const CompileResources = struct {
     pub const Group = struct {
         owner: *CompileResources,
         prefix: []const u8,
-        files: std.ArrayListUnmanaged(File) = .{},
+        files: std.ArrayListUnmanaged(File) = .empty,
 
         /// Adds the file at `path` as a resource named `name` (within the
         /// prefix of the containing group).
@@ -167,6 +167,19 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+
+    const gstapp1 = b.addModule("gstapp1", .{
+        .root_source_file = b.path(b.pathJoin(&.{ "src", "gstapp1", "gstapp1" ++ ".zig" })),
+        .target = target,
+        .optimize = optimize,
+    });
+    libraries.gstapp1.linkTo(gstapp1);
+    gstapp1.addImport("compat", compat);
+
+    const gstapp1_test = b.addTest(.{
+        .root_module = gstapp1,
+    });
+    test_step.dependOn(&b.addRunArtifact(gstapp1_test).step);
 
     const gstbase1 = b.addModule("gstbase1", .{
         .root_source_file = b.path(b.pathJoin(&.{ "src", "gstbase1", "gstbase1" ++ ".zig" })),
@@ -245,31 +258,18 @@ pub fn build(b: *std.Build) void {
     });
     test_step.dependOn(&b.addRunArtifact(gmodule2_test).step);
 
-    const gstapp1 = b.addModule("gstapp1", .{
-        .root_source_file = b.path(b.pathJoin(&.{ "src", "gstapp1", "gstapp1" ++ ".zig" })),
+    const gtk4layershell1 = b.addModule("gtk4layershell1", .{
+        .root_source_file = b.path(b.pathJoin(&.{ "src", "gtk4layershell1", "gtk4layershell1" ++ ".zig" })),
         .target = target,
         .optimize = optimize,
     });
-    libraries.gstapp1.linkTo(gstapp1);
-    gstapp1.addImport("compat", compat);
+    libraries.gtk4layershell1.linkTo(gtk4layershell1);
+    gtk4layershell1.addImport("compat", compat);
 
-    const gstapp1_test = b.addTest(.{
-        .root_module = gstapp1,
+    const gtk4layershell1_test = b.addTest(.{
+        .root_module = gtk4layershell1,
     });
-    test_step.dependOn(&b.addRunArtifact(gstapp1_test).step);
-
-    const adw1 = b.addModule("adw1", .{
-        .root_source_file = b.path(b.pathJoin(&.{ "src", "adw1", "adw1" ++ ".zig" })),
-        .target = target,
-        .optimize = optimize,
-    });
-    libraries.adw1.linkTo(adw1);
-    adw1.addImport("compat", compat);
-
-    const adw1_test = b.addTest(.{
-        .root_module = adw1,
-    });
-    test_step.dependOn(&b.addRunArtifact(adw1_test).step);
+    test_step.dependOn(&b.addRunArtifact(gtk4layershell1_test).step);
 
     const gtk4 = b.addModule("gtk4", .{
         .root_source_file = b.path(b.pathJoin(&.{ "src", "gtk4", "gtk4" ++ ".zig" })),
@@ -414,19 +414,25 @@ pub fn build(b: *std.Build) void {
     });
     test_step.dependOn(&b.addRunArtifact(gdkpixbuf2_test).step);
 
-    const gtk4layershell1 = b.addModule("gtk4layershell1", .{
-        .root_source_file = b.path(b.pathJoin(&.{ "src", "gtk4layershell1", "gtk4layershell1" ++ ".zig" })),
+    const adw1 = b.addModule("adw1", .{
+        .root_source_file = b.path(b.pathJoin(&.{ "src", "adw1", "adw1" ++ ".zig" })),
         .target = target,
         .optimize = optimize,
     });
-    libraries.gtk4layershell1.linkTo(gtk4layershell1);
-    gtk4layershell1.addImport("compat", compat);
+    libraries.adw1.linkTo(adw1);
+    adw1.addImport("compat", compat);
 
-    const gtk4layershell1_test = b.addTest(.{
-        .root_module = gtk4layershell1,
+    const adw1_test = b.addTest(.{
+        .root_module = adw1,
     });
-    test_step.dependOn(&b.addRunArtifact(gtk4layershell1_test).step);
+    test_step.dependOn(&b.addRunArtifact(adw1_test).step);
 
+    gstapp1.addImport("gstbase1", gstbase1);
+    gstapp1.addImport("gst1", gst1);
+    gstapp1.addImport("gobject2", gobject2);
+    gstapp1.addImport("glib2", glib2);
+    gstapp1.addImport("gmodule2", gmodule2);
+    gstapp1.addImport("gstapp1", gstapp1);
     gstbase1.addImport("gst1", gst1);
     gstbase1.addImport("gobject2", gobject2);
     gstbase1.addImport("glib2", glib2);
@@ -441,27 +447,21 @@ pub fn build(b: *std.Build) void {
     glib2.addImport("glib2", glib2);
     gmodule2.addImport("glib2", glib2);
     gmodule2.addImport("gmodule2", gmodule2);
-    gstapp1.addImport("gstbase1", gstbase1);
-    gstapp1.addImport("gst1", gst1);
-    gstapp1.addImport("gobject2", gobject2);
-    gstapp1.addImport("glib2", glib2);
-    gstapp1.addImport("gmodule2", gmodule2);
-    gstapp1.addImport("gstapp1", gstapp1);
-    adw1.addImport("gtk4", gtk4);
-    adw1.addImport("gsk4", gsk4);
-    adw1.addImport("graphene1", graphene1);
-    adw1.addImport("gobject2", gobject2);
-    adw1.addImport("glib2", glib2);
-    adw1.addImport("gdk4", gdk4);
-    adw1.addImport("cairo1", cairo1);
-    adw1.addImport("pangocairo1", pangocairo1);
-    adw1.addImport("pango1", pango1);
-    adw1.addImport("harfbuzz0", harfbuzz0);
-    adw1.addImport("freetype22", freetype22);
-    adw1.addImport("gio2", gio2);
-    adw1.addImport("gmodule2", gmodule2);
-    adw1.addImport("gdkpixbuf2", gdkpixbuf2);
-    adw1.addImport("adw1", adw1);
+    gtk4layershell1.addImport("gtk4", gtk4);
+    gtk4layershell1.addImport("gsk4", gsk4);
+    gtk4layershell1.addImport("graphene1", graphene1);
+    gtk4layershell1.addImport("gobject2", gobject2);
+    gtk4layershell1.addImport("glib2", glib2);
+    gtk4layershell1.addImport("gdk4", gdk4);
+    gtk4layershell1.addImport("cairo1", cairo1);
+    gtk4layershell1.addImport("pangocairo1", pangocairo1);
+    gtk4layershell1.addImport("pango1", pango1);
+    gtk4layershell1.addImport("harfbuzz0", harfbuzz0);
+    gtk4layershell1.addImport("freetype22", freetype22);
+    gtk4layershell1.addImport("gio2", gio2);
+    gtk4layershell1.addImport("gmodule2", gmodule2);
+    gtk4layershell1.addImport("gdkpixbuf2", gdkpixbuf2);
+    gtk4layershell1.addImport("gtk4layershell1", gtk4layershell1);
     gtk4.addImport("gsk4", gsk4);
     gtk4.addImport("graphene1", graphene1);
     gtk4.addImport("gobject2", gobject2);
@@ -537,21 +537,21 @@ pub fn build(b: *std.Build) void {
     gdkpixbuf2.addImport("glib2", glib2);
     gdkpixbuf2.addImport("gmodule2", gmodule2);
     gdkpixbuf2.addImport("gdkpixbuf2", gdkpixbuf2);
-    gtk4layershell1.addImport("gtk4", gtk4);
-    gtk4layershell1.addImport("gsk4", gsk4);
-    gtk4layershell1.addImport("graphene1", graphene1);
-    gtk4layershell1.addImport("gobject2", gobject2);
-    gtk4layershell1.addImport("glib2", glib2);
-    gtk4layershell1.addImport("gdk4", gdk4);
-    gtk4layershell1.addImport("cairo1", cairo1);
-    gtk4layershell1.addImport("pangocairo1", pangocairo1);
-    gtk4layershell1.addImport("pango1", pango1);
-    gtk4layershell1.addImport("harfbuzz0", harfbuzz0);
-    gtk4layershell1.addImport("freetype22", freetype22);
-    gtk4layershell1.addImport("gio2", gio2);
-    gtk4layershell1.addImport("gmodule2", gmodule2);
-    gtk4layershell1.addImport("gdkpixbuf2", gdkpixbuf2);
-    gtk4layershell1.addImport("gtk4layershell1", gtk4layershell1);
+    adw1.addImport("gtk4", gtk4);
+    adw1.addImport("gsk4", gsk4);
+    adw1.addImport("graphene1", graphene1);
+    adw1.addImport("gobject2", gobject2);
+    adw1.addImport("glib2", glib2);
+    adw1.addImport("gdk4", gdk4);
+    adw1.addImport("cairo1", cairo1);
+    adw1.addImport("pangocairo1", pangocairo1);
+    adw1.addImport("pango1", pango1);
+    adw1.addImport("harfbuzz0", harfbuzz0);
+    adw1.addImport("freetype22", freetype22);
+    adw1.addImport("gio2", gio2);
+    adw1.addImport("gmodule2", gmodule2);
+    adw1.addImport("gdkpixbuf2", gdkpixbuf2);
+    adw1.addImport("adw1", adw1);
     const docs_mod = b.createModule(.{
         .root_source_file = b.path("src/root/root.zig"),
         .target = target,
@@ -560,11 +560,6 @@ pub fn build(b: *std.Build) void {
     const docs_obj = b.addObject(.{
         .name = "docs",
         .root_module = docs_mod,
-        // Defaults to false to avoid bringing in the lazy dependency if not building docs.
-        .zig_lib_dir = if (b.option(bool, "autodoc-fork", "Use Autodoc fork for documentation") orelse false) zig_lib_dir: {
-            const zig_autodoc_dep = b.lazyDependency("zig_autodoc", .{}) orelse break :zig_lib_dir null;
-            break :zig_lib_dir zig_autodoc_dep.path("lib");
-        } else null,
     });
     const install_docs = b.addInstallDirectory(.{
         .source_dir = docs_obj.getEmittedDocs(),
@@ -572,13 +567,13 @@ pub fn build(b: *std.Build) void {
         .install_subdir = "docs",
     });
     docs_step.dependOn(&install_docs.step);
+    docs_mod.addImport("gstapp1", gstapp1);
     docs_mod.addImport("gstbase1", gstbase1);
     docs_mod.addImport("gst1", gst1);
     docs_mod.addImport("gobject2", gobject2);
     docs_mod.addImport("glib2", glib2);
     docs_mod.addImport("gmodule2", gmodule2);
-    docs_mod.addImport("gstapp1", gstapp1);
-    docs_mod.addImport("adw1", adw1);
+    docs_mod.addImport("gtk4layershell1", gtk4layershell1);
     docs_mod.addImport("gtk4", gtk4);
     docs_mod.addImport("gsk4", gsk4);
     docs_mod.addImport("graphene1", graphene1);
@@ -590,10 +585,14 @@ pub fn build(b: *std.Build) void {
     docs_mod.addImport("freetype22", freetype22);
     docs_mod.addImport("gio2", gio2);
     docs_mod.addImport("gdkpixbuf2", gdkpixbuf2);
-    docs_mod.addImport("gtk4layershell1", gtk4layershell1);
+    docs_mod.addImport("adw1", adw1);
 }
 
 pub const libraries = struct {
+    pub const gstapp1: Library = .{
+        .system_libraries = &.{"gstreamer-app-1.0"},
+    };
+
     pub const gstbase1: Library = .{
         .system_libraries = &.{"gstreamer-base-1.0"},
     };
@@ -614,12 +613,8 @@ pub const libraries = struct {
         .system_libraries = &.{"gmodule-2.0"},
     };
 
-    pub const gstapp1: Library = .{
-        .system_libraries = &.{"gstreamer-app-1.0"},
-    };
-
-    pub const adw1: Library = .{
-        .system_libraries = &.{"libadwaita-1"},
+    pub const gtk4layershell1: Library = .{
+        .system_libraries = &.{"gtk4-layer-shell-0"},
     };
 
     pub const gtk4: Library = .{
@@ -666,7 +661,7 @@ pub const libraries = struct {
         .system_libraries = &.{"gdk-pixbuf-2.0"},
     };
 
-    pub const gtk4layershell1: Library = .{
-        .system_libraries = &.{"gtk4-layer-shell-0"},
+    pub const adw1: Library = .{
+        .system_libraries = &.{"libadwaita-1"},
     };
 };

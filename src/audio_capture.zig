@@ -52,7 +52,8 @@ pub const AudioCapture = struct {
         // Use tryPullSample with 1s timeout as safety bound.
         while (true) {
             const sample = self.appsink.tryPullSample(1_000_000_000) orelse break;
-            defer sample.unref();
+            // Equivalent to GStreamer's inline gst_sample_unref helper.
+            defer gst.MiniObject.unref(@ptrCast(@alignCast(sample)));
 
             const buffer = sample.getBuffer() orelse continue;
             var map_info: gst.MapInfo = undefined;

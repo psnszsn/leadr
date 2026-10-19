@@ -75383,7 +75383,7 @@ pub const ACCESSIBLE_VALUE_UNDEFINED = -1;
 /// Like `getBinaryAge`, but from the headers used at
 /// application compile time, rather than from the library linked
 /// against at application run time.
-pub const BINARY_AGE = 2002;
+pub const BINARY_AGE = 2003;
 /// The default name of the extension point.
 pub const IM_MODULE_EXTENSION_POINT_NAME = "gtk-im-module";
 /// Constant to return from a signal handler for the ::input
@@ -75394,7 +75394,7 @@ pub const INPUT_ERROR = -1;
 /// Like `getInterfaceAge`, but from the headers used at
 /// application compile time, rather than from the library linked
 /// against at application run time.
-pub const INTERFACE_AGE = 2;
+pub const INTERFACE_AGE = 3;
 /// The value used to refer to a guaranteed invalid position
 /// in a `GListModel`.
 ///
@@ -75424,7 +75424,7 @@ pub const MEDIA_FILE_EXTENSION_POINT_NAME = "gtk-media-file";
 /// Like `getMicroVersion`, but from the headers used at
 /// application compile time, rather than from the library linked
 /// against at application run time.
-pub const MICRO_VERSION = 2;
+pub const MICRO_VERSION = 3;
 /// Like `getMinorVersion`, but from the headers used at
 /// application compile time, rather than from the library linked
 /// against at application run time.

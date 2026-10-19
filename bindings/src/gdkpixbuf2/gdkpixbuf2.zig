@@ -2451,7 +2451,7 @@ pub const PixbufSaveFunc = *const fn (p_buf: [*]const u8, p_count: usize, p_erro
 pub const PIXBUF_MAJOR = 2;
 /// Micro version of gdk-pixbuf library, that is the "2" in
 /// "0.8.2" for example.
-pub const PIXBUF_MICRO = 4;
+pub const PIXBUF_MICRO = 5;
 /// Minor version of gdk-pixbuf library, that is the "8" in
 /// "0.8.2" for example.
 pub const PIXBUF_MINOR = 44;
@@ -2459,7 +2459,7 @@ pub const PIXBUF_MINOR = 44;
 ///
 /// This is the version being compiled against; contrast with
 /// `gdk_pixbuf_version`.
-pub const PIXBUF_VERSION = "2.44.4";
+pub const PIXBUF_VERSION = "2.44.5";
 
 test {
     @setEvalBranchQuota(100_000);

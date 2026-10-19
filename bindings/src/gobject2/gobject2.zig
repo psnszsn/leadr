@@ -6543,7 +6543,7 @@ pub const ClosureMarshal = *const fn (p_closure: *gobject.Closure, p_return_valu
 
 /// The type used for the various notification callbacks which can be registered
 /// on closures.
-pub const ClosureNotify = *const fn (p_data: ?*anyopaque, p_closure: *anyopaque) callconv(.c) void;
+pub const ClosureNotify = *const fn (p_data: ?*anyopaque, p_closure: *gobject.Closure) callconv(.c) void;
 
 /// A callback function used by the type system to initialize a new
 /// instance of a type.
