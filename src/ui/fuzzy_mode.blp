@@ -1,0 +1,42 @@
+using Gtk 4.0;
+
+template $LeadrFuzzyMode: Window {
+  title: "Fuzzy Mode";
+  decorated: false;
+  hide-on-close: true;
+  default-width: 560;
+  default-height: 480;
+  styles ["fuzzy-mode"]
+
+  Box {
+    orientation: vertical;
+    spacing: 12;
+    margin-start: 16;
+    margin-end: 16;
+    margin-top: 16;
+    margin-bottom: 16;
+    Label heading {
+      label: "Fuzzy Mode";
+      xalign: 0;
+      ellipsize: end;
+      styles ["title-3"]
+    }
+    Entry query_entry {
+      placeholder-text: "Search apps and modes…";
+    }
+    ScrolledWindow scroller {
+      vexpand: true;
+      hscrollbar-policy: never;
+      ListBox results_list {
+        selection-mode: single;
+        activate-on-single-click: false;
+        styles ["navigation-sidebar"]
+      }
+    }
+    Label status_label {
+      xalign: 0;
+      wrap: true;
+      styles ["dim-label"]
+    }
+  }
+}

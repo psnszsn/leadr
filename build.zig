@@ -51,7 +51,7 @@ pub fn build(b: *std.Build) void {
     const wf = b.addWriteFiles();
 
     // Compile each .blp → .ui and collect into write-files directory
-    const blueprint_names = [_][]const u8{ "overlay-window", "key-indicator", "cheatsheet", "emoji-picker", "dictation" };
+    const blueprint_names = [_][]const u8{ "overlay-window", "key-indicator", "cheatsheet", "emoji-picker", "dictation", "fuzzy_mode" };
     for (blueprint_names) |name| {
         const bp_compile = b.addSystemCommand(&.{ "blueprint-compiler", "compile", "--output" });
         const ui_file = bp_compile.addOutputFileArg(b.fmt("{s}.ui", .{name}));
@@ -75,6 +75,7 @@ pub fn build(b: *std.Build) void {
         \\    <file compressed="true" preprocess="xml-stripblanks">cheatsheet.ui</file>
         \\    <file compressed="true" preprocess="xml-stripblanks">emoji-picker.ui</file>
         \\    <file compressed="true" preprocess="xml-stripblanks">dictation.ui</file>
+        \\    <file compressed="true" preprocess="xml-stripblanks">fuzzy_mode.ui</file>
         \\  </gresource>
         \\</gresources>
         \\
@@ -111,4 +112,11 @@ pub fn build(b: *std.Build) void {
 
     const run_step = b.step("run", "Run leadrgtk");
     run_step.dependOn(&run_cmd.step);
+
+    const matcher_tests = b.addTest(.{ .root_module = b.createModule(.{
+        .root_source_file = b.path("src/fuzzy.zig"),
+        .target = target,
+        .optimize = optimize,
+    }) });
+    b.step("test", "Test fuzzy matching").dependOn(&b.addRunArtifact(matcher_tests).step);
 }

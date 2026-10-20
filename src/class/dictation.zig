@@ -119,6 +119,10 @@ pub const Dictation = extern struct {
 
     fn startRecording(self: *Self) void {
         const priv = private(self);
+        // Search can open this mode without starting a recording.
+        if (priv.whisper_ctx == null) {
+            priv.whisper_ctx = whisper.initFromFile(model_path);
+        }
         priv.audio = AudioCapture.create();
         if (priv.audio) |*audio| {
             audio.start();
@@ -242,12 +246,13 @@ pub const Dictation = extern struct {
     }
 
     pub fn present(self: *Self) void {
-        const priv = private(self);
+        self.presentIdle();
+        // Leader binding opens while v is held.
+        startRecording(self);
+    }
 
-        // Lazy-load whisper model on first show
-        if (priv.whisper_ctx == null) {
-            priv.whisper_ctx = whisper.initFromFile(model_path);
-        }
+    pub fn presentIdle(self: *Self) void {
+        const priv = private(self);
 
         // Reset state
         priv.transcribing = false;
@@ -260,8 +265,7 @@ pub const Dictation = extern struct {
         self.as(gtk.Widget).setVisible(@intFromBool(true));
         self.as(gtk.Window).present();
 
-        // Start recording immediately (user is holding v)
-        startRecording(self);
+        priv.status_label.setLabel("Hold v to record · Esc → Close");
     }
 
     fn dispose(self: *Self) callconv(.c) void {

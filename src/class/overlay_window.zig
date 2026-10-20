@@ -51,7 +51,7 @@ pub const OverlayWindow = extern struct {
         }
     }
 
-    fn showOverlay(self: *Self) void {
+    pub fn showOverlay(self: *Self) void {
         const priv = private(self);
         priv.navigator.reset(keys.bindings);
         priv.key_indicator.setDisplayKey(null);
@@ -74,15 +74,19 @@ pub const OverlayWindow = extern struct {
             return;
         }
 
-        // Backspace: go up one level (clears sticky if leaving sticky group)
+        // Backspace navigates back in groups, or enters Fuzzy Mode at the root.
         if (keyval == 0xff08) { // GDK_KEY_BackSpace
-            clearStickyState(self);
-            if (!priv.navigator.pop()) {
-                self.hideOverlay();
+            if (!priv.navigator.atRoot()) {
+                clearStickyState(self);
+                _ = priv.navigator.pop();
+                priv.key_indicator.setDisplayKey(null);
+                priv.cheatsheet.updateBindings(priv.navigator.current());
                 return;
             }
-            priv.key_indicator.setDisplayKey(null);
-            priv.cheatsheet.updateBindings(priv.navigator.current());
+            self.hideOverlay();
+            if (self.as(gtk.Window).getApplication()) |app_| {
+                if (gobject.ext.cast(Application, app_)) |app| app.showFuzzyMode();
+            }
             return;
         }
 
@@ -275,4 +279,3 @@ pub const OverlayWindow = extern struct {
         }
     };
 };
-

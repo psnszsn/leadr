@@ -1,6 +1,7 @@
 using Gtk 4.0;
 
 template $LeadrDictation: Window {
+  title: "Dictation";
   decorated: false;
   default-width: 500;
   default-height: 300;
@@ -16,7 +17,7 @@ template $LeadrDictation: Window {
     margin-bottom: 16;
 
     Label status_label {
-      label: "Hold Space to record…";
+      label: "Hold v to record…";
 
       styles ["dictation-status"]
     }

@@ -79,3 +79,13 @@
     font-size: 18px;
     opacity: 0.7;
 }
+
+.fuzzy-mode {
+    background: @window_bg_color;
+    border-radius: 16px;
+}
+
+.fuzzy-mode row {
+    padding: 8px 12px;
+    border-radius: 8px;
+}

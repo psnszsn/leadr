@@ -10,6 +10,8 @@ const Common = @import("../class.zig").Common;
 const Dictation = @import("dictation.zig").Dictation;
 const EmojiPicker = @import("emoji_picker.zig").EmojiPicker;
 const OverlayWindow = @import("overlay_window.zig").OverlayWindow;
+const FuzzyMode = @import("fuzzy_mode.zig").FuzzyMode;
+const Mode = @import("../mode.zig").Mode;
 
 pub const Application = extern struct {
     const Self = @This();
@@ -27,6 +29,7 @@ pub const Application = extern struct {
         overlay_window: ?*OverlayWindow = null,
         emoji_picker: ?*EmojiPicker = null,
         dictation: ?*Dictation = null,
+        fuzzy_mode: ?*FuzzyMode = null,
         css_provider: ?*gtk.CssProvider = null,
 
         pub var offset: c_int = 0;
@@ -68,12 +71,22 @@ pub const Application = extern struct {
         const dictation = gobject.ext.newInstance(Dictation, .{});
         dictation.as(gtk.Window).setApplication(self.as(gtk.Application));
         priv.dictation = dictation;
+
+        const fuzzy_mode = gobject.ext.newInstance(FuzzyMode, .{});
+        fuzzy_mode.as(gtk.Window).setApplication(self.as(gtk.Application));
+        priv.fuzzy_mode = fuzzy_mode;
     }
 
     fn activate(self: *Self) callconv(.c) void {
         gio.Application.virtual_methods.activate.call(Class.parent, self.as(Parent));
 
         const priv = private(self);
+        if (priv.fuzzy_mode) |fuzzy_mode| {
+            if (fuzzy_mode.as(gtk.Widget).getVisible() != 0) {
+                fuzzy_mode.as(gtk.Widget).setVisible(0);
+                return;
+            }
+        }
         if (priv.overlay_window) |window| {
             window.toggle();
         }
@@ -105,6 +118,19 @@ pub const Application = extern struct {
         }
     }
 
+    pub fn showFuzzyMode(self: *Self) void {
+        if (private(self).fuzzy_mode) |fuzzy_mode| fuzzy_mode.present();
+    }
+
+    pub fn showMode(self: *Self, mode: Mode) void {
+        switch (mode) {
+            .leader => if (private(self).overlay_window) |window| window.showOverlay(),
+            .fuzzy => self.showFuzzyMode(),
+            .emoji => self.showEmojiPicker(),
+            .dictation => if (private(self).dictation) |d| d.presentIdle(),
+        }
+    }
+
     fn dispose(self: *Self) callconv(.c) void {
         const priv = private(self);
 
@@ -121,6 +147,11 @@ pub const Application = extern struct {
         if (priv.dictation) |d| {
             d.unref();
             priv.dictation = null;
+        }
+
+        if (priv.fuzzy_mode) |fuzzy_mode| {
+            fuzzy_mode.unref();
+            priv.fuzzy_mode = null;
         }
 
         if (priv.css_provider) |p| {
@@ -156,6 +187,7 @@ pub const Application = extern struct {
             gobject.ext.ensureType(OverlayWindow);
             gobject.ext.ensureType(EmojiPicker);
             gobject.ext.ensureType(Dictation);
+            gobject.ext.ensureType(FuzzyMode);
             gio.Application.virtual_methods.startup.implement(class, &startup);
             gio.Application.virtual_methods.activate.implement(class, &activate);
             gio.Application.virtual_methods.command_line.implement(class, &commandLine);

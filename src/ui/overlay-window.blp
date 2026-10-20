@@ -16,6 +16,15 @@ template $LeadrOverlayWindow: Window {
     spacing: 24;
 
     $LeadrKeyIndicator key_indicator {}
-    $LeadrCheatsheet cheatsheet {}
+    Box {
+      orientation: vertical;
+      spacing: 8;
+
+      $LeadrCheatsheet cheatsheet {}
+      Label {
+        label: "Backspace → Back / Fuzzy Mode at root · Esc → Close";
+        styles ["dim-label"]
+      }
+    }
   }
 }
