@@ -46,7 +46,7 @@ pub const bindings: []const config.Binding = &.{
     } } },
     .{ .key = 'b', .label = "Browser", .action = .{ .command = "hyprctl dispatch 'hl.dsp.focus({ window = \"class:firefox\" })'" } },
     .{ .key = 'g', .label = "Ghostty", .action = .{ .command = "hyprctl dispatch 'hl.dsp.focus({ window = \"class:com.mitchellh.ghostty\" })'" } },
-    .{ .key = 't', .label = "T3 Code", .action = .{ .command = "hyprctl dispatch 'hl.dsp.focus({ window = \"class:t3code\" })'" } },
+    .{ .key = 't', .label = "T3 Code", .action = .{ .command = "hyprctl dispatch 'hl.dsp.focus({ window = \"class:com.t3tools.T3Code\" })'" } },
     .{ .key = 'x', .label = "Close Window", .action = .{ .command = "hyprctl dispatch 'hl.dsp.window.close()'" } },
     .{ .key = 'e', .label = "Emoji", .action = .emoji },
     .{ .key = 'v', .label = "Voice", .action = .dictation },
